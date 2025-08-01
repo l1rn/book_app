@@ -23,10 +23,8 @@ add_executable(book_list_app main.cpp
         widgets/SpecialButton.h
         models/author.c
         models/book.c
-        models/publisher.c
         models/author.h
         models/book.h
-        models/publisher.h
 )
 
 target_include_directories(book_list_app PRIVATE models)

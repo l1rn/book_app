@@ -8,7 +8,7 @@ typedef struct {
     char name[50];
 } Author;
 
-Author create_author(const char *name, const char *surname);
-void print_author(const Author *author);
+Author createAuthor(const char *name, const char *surname);
+void printAuthor(const Author *author);
 
 #endif
