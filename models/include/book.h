@@ -14,6 +14,7 @@ typedef struct Book {
     struct Publisher *publisher;
     Author  *authors;
     int     authorCount;
+    int     authorCapacity;
 } Book;
 
 Book createBook(int isbn13,
@@ -23,7 +24,8 @@ Book createBook(int isbn13,
                 int pages);
 void bookSetPublisher(Book *b, struct Publisher *p);
 
-// void bookAddAuthor(Book *b, Author *author);
+void bookAddAuthor(Book *b, const Author *author);
+void clearAllAuthors(Book *b);
 
 void printBook(Book *book);
 

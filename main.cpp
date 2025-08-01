@@ -17,7 +17,11 @@ int main(int argc, char *argv[]) {
     Publisher publisher = createPublisher("Super book publisher");
 
     bookSetPublisher(&book, &publisher);
-
+    bookAddAuthor(&book, &a);
+    bookAddAuthor(&book, &a);
+    bookAddAuthor(&book, &a);
+    printBook(&book);
+    clearAllAuthors(&book);
     printBook(&book);
     return 0;
 }

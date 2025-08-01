@@ -26,15 +26,27 @@ void bookSetPublisher(Book *b, Publisher *p) {
     b->publisher = p;
 }
 
-// void bookAddAuthor(Book *b, Author *author) {
-//     Author **tmp = realloc(b->authors, sizeof *tmp * (b->authorCount + 1));
-//     if (!tmp) {
-//         perror("realloc");
-//         exit(EXIT_FAILURE);
-//     }
-//     b->authors = tmp;
-//     b->authors[b->authorCount++] = *author;
-// }
+void clearAllAuthors(Book *b) {
+    free(b->authors);
+    b->authors = NULL;
+    b->authorCount = 0;
+    b->authorCapacity = 0;
+}
+
+void bookAddAuthor(Book *b, const Author *author) {
+    if (b->authorCount >= b->authorCapacity) {
+        const int newCapacity = b->authorCapacity == 0 ? 2 : b->authorCapacity * 2;
+        Author *tmp = realloc(b->authors, newCapacity * sizeof(Author));
+        if (!tmp) {
+            perror("Failed to expand authors array");
+            return;
+        }
+        b->authors = tmp;
+        b->authorCapacity = newCapacity;
+    }
+
+    b->authors[b->authorCount++] = *author;
+}
 
 void printBook(Book *book) {
     printf("ISBN-13: %d", book->isbn13);
