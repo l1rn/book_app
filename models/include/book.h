@@ -5,7 +5,7 @@
 
 struct Publisher;
 
-typedef struct {
+typedef struct Book {
     int     isbn13;
     int     isbn10;
     char    bookName[500];
@@ -15,18 +15,16 @@ typedef struct {
     Author  *authors;
     int     authorCount;
 } Book;
-struct Publisher{
-    Book *books;
-    char company_name[120];
-};
 
-Book createBook(const int isbn13,
-                const int isbn10,
+Book createBook(int isbn13,
+                int isbn10,
                 const char *bookName,
                 const char *publicationDate,
-                const int pages);
-// void bookSetPublisher(Book *b, Publisher *p);
-// void bookSetAuthors(Book *b, Author *authors, int count);
+                int pages);
+void bookSetPublisher(Book *b, struct Publisher *p);
+
+// void bookAddAuthor(Book *b, Author *author);
+
 void printBook(Book *book);
 
 #endif

@@ -1,7 +1,10 @@
-#include "book.h"
-#include "author.h"
+#include "../include/book.h"
+#include "../include/author.h"
+#include "../include/publisher.h"
+
 #include "string.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 Book createBook(const int isbn13, const int isbn10, const char *bookName, const char *publicationDate, const int pages) {
     Book b = { 0 };
@@ -19,13 +22,18 @@ Book createBook(const int isbn13, const int isbn10, const char *bookName, const 
     return b;
 }
 
-// void bookSetPublisher(Book *b, Publisher *p) {
-//     b->publisher = p;
-// }
-//
-// void bookSetAuthors(Book *b, Author *authors, int count) {
-//     b->authors = authors;
-//     b->authorCount = count;
+void bookSetPublisher(Book *b, Publisher *p) {
+    b->publisher = p;
+}
+
+// void bookAddAuthor(Book *b, Author *author) {
+//     Author **tmp = realloc(b->authors, sizeof *tmp * (b->authorCount + 1));
+//     if (!tmp) {
+//         perror("realloc");
+//         exit(EXIT_FAILURE);
+//     }
+//     b->authors = tmp;
+//     b->authors[b->authorCount++] = *author;
 // }
 
 void printBook(Book *book) {

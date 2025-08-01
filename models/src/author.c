@@ -1,4 +1,4 @@
-#include "author.h"
+#include "../include/author.h"
 #include <string.h>
 #include <stdio.h>
 
