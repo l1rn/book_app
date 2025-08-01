@@ -4,6 +4,7 @@
 
 
 typedef struct {
+    int id;
     char surname[50];
     char name[50];
 } Author;

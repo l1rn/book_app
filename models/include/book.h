@@ -3,15 +3,15 @@
 #define BOOK_H
 #include "author.h"
 
-struct Publisher;
+typedef struct Publisher;
 
 typedef struct Book {
     int     isbn13;
     int     isbn10;
     char    bookName[500];
-    char    publicationDate[10];
+    char    publicationDate[11];
     int     pages;
-    struct Publisher *publisher;
+    int     publisherId;
     Author  *authors;
     int     authorCount;
     int     authorCapacity;
@@ -22,7 +22,7 @@ Book createBook(int isbn13,
                 const char *bookName,
                 const char *publicationDate,
                 int pages);
-void bookSetPublisher(Book *b, struct Publisher *p);
+void bookSetPublisher(Book *b, const struct Publisher *p);
 
 void bookAddAuthor(Book *b, const Author *author);
 void clearAllAuthors(Book *b);

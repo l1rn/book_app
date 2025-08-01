@@ -15,15 +15,15 @@ Book createBook(const int isbn13, const int isbn10, const char *bookName, const 
     strncpy(b.publicationDate, publicationDate, sizeof b.publicationDate - 1);
     b.pages = pages;
 
-    b.publisher = NULL;
+    b.publisherId = 0;
     b.authors = NULL;
     b.authorCount = 0;
 
     return b;
 }
 
-void bookSetPublisher(Book *b, Publisher *p) {
-    b->publisher = p;
+void bookSetPublisher(Book *b, const Publisher *p) {
+    b->publisherId = p->id;
 }
 
 void clearAllAuthors(Book *b) {
@@ -54,8 +54,8 @@ void printBook(Book *book) {
     printf("\nName: %s\n", book->bookName);
     printf("Pages: %d\n", book->pages);
 
-    if (book->publisher)
-        printf("Publisher: %s\n", book->publisher->company_name);
+    if (book->publisherId)
+        printf("Publisher: %s\n", book->publisher->companyName);
     else
         puts("Publisher: (none)");
 

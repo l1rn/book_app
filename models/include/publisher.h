@@ -4,10 +4,14 @@
 struct Book;
 
 typedef struct Publisher{
+    int id;
     struct Book *books;
     int bookCount;
-    char company_name[120];
+    int bookCapacity;
+    char companyName[120];
 } Publisher;
 
 Publisher createPublisher(const char* name);
+void printPublisher(const Publisher *publisher);
+void clearPublisherBooks(Publisher *p);
 #endif
