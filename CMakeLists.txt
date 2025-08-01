@@ -10,11 +10,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 
-find_package(Qt6 COMPONENTS
-        Core
-        Gui
-        Widgets
-        REQUIRED)
+find_package(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
 
 add_executable(book_list_app main.cpp
         ui/mainwindow.cpp
@@ -28,16 +24,22 @@ add_executable(book_list_app main.cpp
         models/include/publisher.h
         models/src/publisher.c
 )
+add_library(
+        sqlite3 STATIC third_party/sqlite/sqlite3.c
+        widgets
+        widgets/SpecialButton.cpp
+        widgets/SpecialButton.h)
 
-target_include_directories(book_list_app PRIVATE models)
+target_include_directories(sqlite3 PUBLIC
+        third_party/sqlite
+        book_list_app PRIVATE models)
 
-add_library(widgets
-    widgets/SpecialButton.cpp
-    widgets/SpecialButton.h)
-target_link_libraries(book_list_app
-        Qt::Core
-        Qt::Gui
-        Qt::Widgets
+
+target_link_libraries(
+        book_list_app
+        PRIVATE
+            Qt::Core Qt::Gui Qt::Widgets
+            sqlite3
 )
 
 if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
