@@ -39,6 +39,11 @@ int dbOpen(const char *filename){
 }
 
 int dbInit(const char *schemaPath) {
+    if (db == NULL) {
+        fprintf(stderr, "Database not open. Call dbOpen first. \n");
+        return 1;
+    }
+
     char *schema = readFile(schemaPath);
     if (!schema) {
         fprintf(stderr, "Schema file not found%s\n", schemaPath);

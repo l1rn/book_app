@@ -22,7 +22,13 @@ int main(int argc, char *argv[]) {
     clearAllAuthors(&book);
     printBook(&book);
 
-    if (dbInit("/home/lirn/CLionProjects/book_app/data/schemes/001_init.sql") != 0) {
+    if (dbOpen("/data/local.db") != 0) {
+        std::cerr << "Database open failed\n";
+        dbClose();
+        return 1;
+    }
+
+    if (dbInit("/data/schemes/001_init.sql") != 0) {
         std::cerr << "Database schema init failed.\n";
         dbClose();
         return 1;
