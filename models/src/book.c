@@ -55,7 +55,7 @@ void printBook(Book *book) {
     printf("Pages: %d\n", book->pages);
 
     if (book->publisherId)
-        printf("Publisher: %s\n", book->publisher->companyName);
+        printf("Publisher: %d\n", book->publisherId);
     else
         puts("Publisher: (none)");
 

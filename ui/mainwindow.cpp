@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include <QVBoxLayout>
-#include "../widgets/SpecialButton.h"
 
 MainWindow::MainWindow(QWidget *parent)
     :QMainWindow(parent) {
@@ -10,7 +9,6 @@ MainWindow::MainWindow(QWidget *parent)
     QWidget *centralWidget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(centralWidget);
 
-    button = new SpecialButton(this);
     button->setText("click me");
     layout->addWidget(button, 0, Qt::AlignCenter);
 

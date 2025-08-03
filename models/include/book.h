@@ -3,7 +3,7 @@
 #define BOOK_H
 #include "author.h"
 
-typedef struct Publisher;
+struct Publisher;
 
 typedef struct Book {
     int     isbn13;

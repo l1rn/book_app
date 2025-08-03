@@ -15,8 +15,8 @@ find_package(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
 add_executable(book_list_app main.cpp
         ui/mainwindow.cpp
         ui/mainwindow.h
-        widgets/SpecialButton.cpp
-        widgets/SpecialButton.h
+        data/db.c
+        data/db.h
         models/src/author.c
         models/src/book.c
         models/include/author.h
@@ -26,9 +26,7 @@ add_executable(book_list_app main.cpp
 )
 add_library(
         sqlite3 STATIC third_party/sqlite/sqlite3.c
-        widgets
-        widgets/SpecialButton.cpp
-        widgets/SpecialButton.h)
+        widgets)
 
 target_include_directories(sqlite3 PUBLIC
         third_party/sqlite
