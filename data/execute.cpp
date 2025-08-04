@@ -3,8 +3,8 @@
 
 extern "C"{
     #include "db.h"
-    #include "../dao/include/author_dao.h"
-    #include "../models/include/author.h"
+    #include "author_dao.h"
+    #include "author.h"
 }
 
 int handle_open() {

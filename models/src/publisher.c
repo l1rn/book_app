@@ -1,4 +1,4 @@
-#include "../include/publisher.h"
+#include "publisher.h"
 #include <stdio.h>
 #include <string.h>
 

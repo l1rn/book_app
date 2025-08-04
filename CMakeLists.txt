@@ -34,7 +34,10 @@ add_library(
 
 target_include_directories(sqlite3 PUBLIC
         third_party/sqlite
-        book_list_app PRIVATE models)
+        book_list_app PUBLIC
+        "${CMAKE_CURRENT_SOURCE_DIR}/dao/include"
+        "${CMAKE_CURRENT_SOURCE_DIR}/models/include"
+        "${CMAKE_CURRENT_SOURCE_DIR}/data")
 
 
 target_link_libraries(

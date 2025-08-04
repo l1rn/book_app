@@ -1,9 +1,9 @@
 #include <sqlite3.h>
 #include <stdio.h>
 
-#include "/home/lirn/CLionProjects/book_app/dao/include/author_dao.h"
-#include "/home/lirn/CLionProjects/book_app/models/include/author.h"
-#include "/home/lirn/CLionProjects/book_app/data/db.h"
+#include "author_dao.h"
+#include "author.h"
+#include "db.h"
 
 int author_dao_create(Author *author){
 	const char *sql = "INSERT INTO Author (name, surname) VALUES (?, ?);";

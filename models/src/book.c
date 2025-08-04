@@ -1,6 +1,6 @@
-#include "../include/book.h"
-#include "../include/author.h"
-#include "../include/publisher.h"
+#include "book.h"
+#include "author.h"
+#include "publisher.h"
 
 #include "string.h"
 #include <stdio.h>
