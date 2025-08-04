@@ -15,6 +15,8 @@ find_package(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
 add_executable(book_list_app main.cpp
         ui/mainwindow.cpp
         ui/mainwindow.h
+        dao/include/author_dao.h
+        dao/src/author_dao.c
         data/db.c
         data/db.h
         data/execute.hpp
@@ -25,7 +27,6 @@ add_executable(book_list_app main.cpp
         models/include/book.h
         models/include/publisher.h
         models/src/publisher.c
-        data/execute.hpp
 )
 add_library(
         sqlite3 STATIC third_party/sqlite/sqlite3.c
