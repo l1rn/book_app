@@ -11,7 +11,7 @@ typedef struct Publisher{
     char companyName[120];
 } Publisher;
 
-Publisher createPublisher(const char* name);
-void printPublisher(const Publisher *publisher);
-void clearPublisherBooks(Publisher *p);
+Publisher create_publisher(const char* name);
+void print_publisher(const Publisher *publisher);
+void clear_publisher_books(Publisher *p);
 #endif

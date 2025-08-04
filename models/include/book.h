@@ -17,16 +17,16 @@ typedef struct Book {
     int     authorCapacity;
 } Book;
 
-Book createBook(int isbn13,
+Book create_book(int isbn13,
                 int isbn10,
                 const char *bookName,
                 const char *publicationDate,
                 int pages);
-void bookSetPublisher(Book *b, const struct Publisher *p);
+void book_set_publisher(Book *b, const struct Publisher *p);
 
-void bookAddAuthor(Book *b, const Author *author);
-void clearAllAuthors(Book *b);
+void book_add_author(Book *b, const Author *author);
+void clear_all_authors(Book *b);
 
-void printBook(Book *book);
+void print_book(Book *book);
 
 #endif

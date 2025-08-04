@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-Book createBook(const int isbn13, const int isbn10, const char *bookName, const char *publicationDate, const int pages) {
+Book create_book(const int isbn13, const int isbn10, const char *bookName, const char *publicationDate, const int pages) {
     Book b = { 0 };
     b.isbn13 = isbn13;
     b.isbn10 = isbn10;
@@ -22,18 +22,18 @@ Book createBook(const int isbn13, const int isbn10, const char *bookName, const 
     return b;
 }
 
-void bookSetPublisher(Book *b, const Publisher *p) {
+void book_set_publisher(Book *b, const Publisher *p) {
     b->publisherId = p->id;
 }
 
-void clearAllAuthors(Book *b) {
+void clear_all_authors(Book *b) {
     free(b->authors);
     b->authors = NULL;
     b->authorCount = 0;
     b->authorCapacity = 0;
 }
 
-void bookAddAuthor(Book *b, const Author *author) {
+void book_add_author(Book *b, const Author *author) {
     if (b->authorCount >= b->authorCapacity) {
         const int newCapacity = b->authorCapacity == 0 ? 2 : b->authorCapacity * 2;
         Author *tmp = realloc(b->authors, newCapacity * sizeof(Author));
@@ -48,7 +48,7 @@ void bookAddAuthor(Book *b, const Author *author) {
     b->authors[b->authorCount++] = *author;
 }
 
-void printBook(Book *book) {
+void print_book(Book *book) {
     printf("ISBN-13: %d", book->isbn13);
 
     printf("\nName: %s\n", book->bookName);

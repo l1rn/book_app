@@ -17,12 +17,15 @@ add_executable(book_list_app main.cpp
         ui/mainwindow.h
         data/db.c
         data/db.h
+        data/execute.hpp
+        data/execute.cpp
         models/src/author.c
         models/src/book.c
         models/include/author.h
         models/include/book.h
         models/include/publisher.h
         models/src/publisher.c
+        data/execute.hpp
 )
 add_library(
         sqlite3 STATIC third_party/sqlite/sqlite3.c

@@ -29,16 +29,23 @@ static char* readFile(const char* path) {
     return buffer;
 }
 
-int dbOpen(const char *filename){
+int db_open(const char *filename){
     if(sqlite3_open(filename, &db) != SQLITE_OK){
         fprintf(stderr, "DB open failed, %s\n", sqlite3_errmsg(db));
         return 1;
     }
-    printf("DB open!");
+    printf("DB open!\n");
     return 0;
 }
 
-int dbInit(const char *schemaPath) {
+int db_check() {
+    if (db != NULL) {
+        return 0;
+    }
+    return 1;
+}
+
+int db_init(const char *schemaPath) {
     if (db == NULL) {
         fprintf(stderr, "Database not open. Call dbOpen first. \n");
         return 1;
@@ -61,6 +68,6 @@ int dbInit(const char *schemaPath) {
     return 0;
 }
 
-void dbClose(void) {
+void db_close(void) {
     if (db) sqlite3_close(db);
 }

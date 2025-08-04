@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 
-Author createAuthor(const char *name, const char *surname){
+Author create_author(const char *name, const char *surname){
     Author a = { 0 };
     if (name) {
         strncpy(a.name, name, sizeof(a.name)-1);
@@ -15,7 +15,7 @@ Author createAuthor(const char *name, const char *surname){
     return a;
 }
 
-void printAuthor(const Author *author) {
+void print_author(const Author *author) {
     if (author) {
         printf("Author: %s %s\n", author->name, author->surname);
     }

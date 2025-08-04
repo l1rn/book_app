@@ -1,41 +1,20 @@
 #include <iostream>
 #include <QApplication>
 
+#include "data/execute.hpp"
+
 extern "C" {
 #include "models/include/author.h"
 #include "models/include/book.h"
 #include "models/include/publisher.h"
 #include "data/db.h"
+
 }
 
 int main(int argc, char *argv[]) {
-    Author a = createAuthor("Brian", "Kelly");
-    printAuthor(&a);
-
-    Book book = createBook(123, 123, "Game of Thrones", "22.10.2004", 333);
-    Publisher publisher = createPublisher("Super book publisher");
-    bookSetPublisher(&book, &publisher);
-    bookAddAuthor(&book, &a);
-    bookAddAuthor(&book, &a);
-    bookAddAuthor(&book, &a);
-    printBook(&book);
-    clearAllAuthors(&book);
-    printBook(&book);
-
-    if (dbOpen("/data/local.db") != 0) {
-        std::cerr << "Database open failed\n";
-        dbClose();
-        return 1;
+    if (handle_open() == 1) {
+        std::cerr << "Database failed\n";
     }
 
-    if (dbInit("/data/schemes/001_init.sql") != 0) {
-        std::cerr << "Database schema init failed.\n";
-        dbClose();
-        return 1;
-    }
-
-    std::cout << "Database ready!\n";
-
-    dbClose();
     return 0;
 }

@@ -5,8 +5,9 @@
 
 extern sqlite3 *db;
 
-int     dbOpen(const char *filename);
-int     dbInit(const char *schemaPath);
-void  dbClose(void);
+int     db_open(const char *filename);
+int     db_init(const char *schemaPath);
+int     db_check();
+void  db_close(void);
 
 #endif
