@@ -5,6 +5,8 @@ extern "C"{
     #include "db.h"
     #include "author_dao.h"
     #include "author.h"
+
+    #include "string.h"
 }
 
 int handle_open() {
@@ -17,14 +19,19 @@ int handle_open() {
     if (db_init("../data/schemes/001_init.sql") == 0) {
         std::cout << "Database ready!\n";
 
-        Author new_author = { .name = "George", .surname = "Orwell"  };
+        Author new_author = {
+            .name = strdup("George"),
+            .surname = strdup("Orwell")
+        };
 
-        if (create(&new_author) != 0) {
+        if (author_dao_create(&new_author) != 0) {
             fprintf(stderr, "Failed to create author");
         }
-        else {
-            printf("Create author - %s, %s\n", new_author.name, new_author.surname);
+
+        if (author_dao_find_by_id(&new_author) != 0) {
+            fprintf(stderr, "Failed to select author\n");
         }
+
     }
     else {
         std::cerr << "Database schema init failed.\n";

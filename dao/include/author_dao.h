@@ -11,7 +11,8 @@ typedef enum failure_status {
     FAIL_NOT_FOUND
 } failure_status;
 
-failure_status author_create(Author *author);
-failure_status author_find_by_id(Author *author);
+failure_status author_dao_create(Author *author);
+failure_status author_dao_find_by_id(Author *author);
+failure_status author_dao_find_all();
 
 #endif 

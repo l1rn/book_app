@@ -7,7 +7,7 @@
 #include "db.h"
 
 
-void handle_sql_error(failure_status status) {
+void handle_dao_sql_error(failure_status status) {
 	const char *msg = NULL;
 	switch (status) {
 		case FAIL_PREPARE:
@@ -28,8 +28,8 @@ void handle_sql_error(failure_status status) {
 
 	fprintf(stderr, "%s %s\n", msg, sqlite3_errmsg(db));
 }
-
-failure_status author_create(Author *author){
+// Create
+failure_status author_dao_create(Author *author){
 	const char *sql = "INSERT INTO Author (name, surname) VALUES (?, ?);";
 	sqlite3_stmt *stmt;
 
@@ -52,7 +52,19 @@ failure_status author_create(Author *author){
 	return FAIL_NONE;
 }
 
-failure_status author_find_by_id(Author *author) {
+// Read
+failure_status author_dao_find_all(Author **authors, int *count) {
+	const char *sql = "SELECT id, name, surname FROM Author";
+	sqlite3_stmt *stmt;
+	if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+		return FAIL_PREPARE;
+	}
+
+	sqlite3_finalize(stmt);
+	return FAIL_NONE;
+}
+
+failure_status author_dao_find_by_id(Author *author) {
 	const char *sql = "SELECT *  FROM Author WHERE id =?";
 	sqlite3_stmt *stmt;
 
