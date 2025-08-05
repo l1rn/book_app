@@ -4,8 +4,8 @@
 
 typedef struct {
     int id;
-    char name[50];
-    char surname[50];
+    char* name;
+    char* surname;
 } Author;
 
 Author create_author(const char *name, const char *surname);

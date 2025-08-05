@@ -19,7 +19,7 @@ int handle_open() {
 
         Author new_author = { .name = "George", .surname = "Orwell"  };
 
-        if (author_dao_create(&new_author) != 0) {
+        if (create(&new_author) != 0) {
             fprintf(stderr, "Failed to create author");
         }
         else {
