@@ -4,11 +4,10 @@
 #include "src/project/execute.hpp"
 
 extern "C" {
-#include "models/include/author.h"
-#include "models/include/book.h"
-#include "models/include/publisher.h"
-#include "src/db/db.h"
-
+#include "author.h"
+#include "book.h"
+#include "publisher.h"
+#include "db.h"
 }
 
 int main(int argc, char *argv[]) {

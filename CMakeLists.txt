@@ -38,7 +38,7 @@ target_include_directories(sqlite3 PUBLIC
         "src/dao/"
         "src/models/"
         "src/db"
-        "${CMAKE_CURRENT_SOURCE_DIR}/data")
+        "src/data")
 
 
 target_link_libraries(

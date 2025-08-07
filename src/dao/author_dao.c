@@ -1,6 +1,7 @@
 #include <sqlite3.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "author_dao.h"
 
@@ -8,6 +9,8 @@
 
 #include "author.h"
 #include "db.h"
+
+int author_dao_check_existence(const unsigned char *name, const unsigned char *surname);
 
 void handle_dao_sql_error(failure_status status) {
 	const char *msg = NULL;
@@ -27,6 +30,9 @@ void handle_dao_sql_error(failure_status status) {
 		case FAIL_MEMORY_ALLOC:
 			msg = "Unable to allocate memory";
 			break;
+		case FAIL_ALREADY_EXIST:
+			msg = "Record already exist";
+			break;
 		default:
 			msg = "Unknown error.";
 	}
@@ -36,6 +42,10 @@ void handle_dao_sql_error(failure_status status) {
 
 // Create
 failure_status author_dao_create(Author *author){
+	if (author_dao_check_existence((const unsigned char *) author->name, (const unsigned char *) author->surname) == 1) {
+		handle_dao_sql_error(FAIL_ALREADY_EXIST);
+		return FAIL_NONE;
+	}
 	const char *sql = "INSERT INTO Author (name, surname) VALUES (?, ?);";
 	sqlite3_stmt *stmt;
 
@@ -59,6 +69,32 @@ failure_status author_dao_create(Author *author){
 }
 
 // Read
+int author_dao_check_existence(const unsigned char *name, const unsigned char *surname) {
+	sqlite3_stmt *stmt = NULL;
+	const char *sql = "SELECT COUNT(*) FROM Author WHERE name = ? AND surname = ?";
+	if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+		handle_dao_sql_error(FAIL_PREPARE);
+		return NULL;
+	}
+	if (sqlite3_bind_text(stmt, 1, (const char *) name, -1, SQLITE_STATIC) != SQLITE_OK ||
+		sqlite3_bind_text(stmt, 2, (const char *) surname, -1, SQLITE_STATIC) != SQLITE_OK) {
+		handle_dao_sql_error(FAIL_BIND);
+		return NULL;
+	}
+
+	int rc = sqlite3_step(stmt);
+	if (rc == SQLITE_ROW) {
+		sqlite3_finalize(stmt);
+		if (sqlite3_column_int(stmt, 0) == 1) {
+			return 1;
+		}
+		return 0;
+	}
+
+	sqlite3_finalize(stmt);
+	return 0;
+}
+
 int author_dao_count() {
 	const char *sql = "SELECT COUNT(*) FROM Author";
 	int count = 0;

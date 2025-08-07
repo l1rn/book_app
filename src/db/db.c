@@ -51,11 +51,16 @@ int db_init(const char *schemaPath) {
         return 1;
     }
 
+    if (readFile(schemaPath) != NULL) {
+        return 0;
+    }
+
     char *schema = readFile(schemaPath);
     if (!schema) {
         fprintf(stderr, "Schema file not found%s\n", schemaPath);
         return 1;
     }
+
     printf("%s", schema);
     char *errMsg = NULL;
     if (sqlite3_exec(db, schema, 0, 0, &errMsg) != SQLITE_OK) {

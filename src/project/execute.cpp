@@ -3,14 +3,14 @@
 
 extern "C"{
     #include "../db/db.h"
-#include "author_dao.h"
+    #include "author_dao.h"
     #include "author.h"
 
     #include "string.h"
 }
 
 int handle_open() {
-    if (db_open("../data/local.db") != 0) {
+    if (db_open("local.db") != 0) {
         std::cerr << "Database open failed\n";
         db_close();
         return 1;
