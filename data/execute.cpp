@@ -28,10 +28,14 @@ int handle_open() {
             fprintf(stderr, "Failed to create author");
         }
 
-        if (author_dao_find_by_id(&new_author) != 0) {
+        Author *author = author_dao_find_by_id(new_author.id);
+
+        if (author == nullptr) {
             fprintf(stderr, "Failed to select author\n");
         }
-
+        else {
+            print_author(author);
+        }
     }
     else {
         std::cerr << "Database schema init failed.\n";

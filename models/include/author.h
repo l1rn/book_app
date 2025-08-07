@@ -8,7 +8,7 @@ typedef struct {
     char* surname;
 } Author;
 
-Author* create_author_dao(const char *name, const char *surname);
+Author* author_create_model(const unsigned char *name, const unsigned char *surname);
 void free_author(Author *author);
 void print_author(const Author *author);
 

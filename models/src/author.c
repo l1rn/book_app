@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-Author* author_create_model(const char *name, const char *surname){
+Author* author_create_model(const unsigned char *name, const unsigned char *surname){
     Author *author = (Author*) malloc(sizeof(Author));
     if (!author) return NULL;
 
@@ -13,7 +13,7 @@ Author* author_create_model(const char *name, const char *surname){
         return NULL;
     }
 
-    author->surname = surname ? strdup(name) : NULL;
+    author->surname = surname ? strdup(surname) : NULL;
     if (!author->surname && surname) {
         free(author->name);
         free(author);
@@ -24,7 +24,9 @@ Author* author_create_model(const char *name, const char *surname){
 
 void free_author(Author *author) {
     if (author) {
+        author->name = NULL;
         free(author->name);
+        author->surname = NULL;
         free(author->surname);
         free(author);
     }
