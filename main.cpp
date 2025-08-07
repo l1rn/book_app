@@ -1,13 +1,13 @@
 #include <iostream>
 #include <QApplication>
 
-#include "data/execute.hpp"
+#include "src/project/execute.hpp"
 
 extern "C" {
 #include "models/include/author.h"
 #include "models/include/book.h"
 #include "models/include/publisher.h"
-#include "data/db.h"
+#include "src/db/db.h"
 
 }
 

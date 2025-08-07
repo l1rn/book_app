@@ -2,8 +2,8 @@
 #include <iostream>
 
 extern "C"{
-    #include "db.h"
-    #include "author_dao.h"
+    #include "../db/db.h"
+#include "author_dao.h"
     #include "author.h"
 
     #include "string.h"

@@ -15,18 +15,18 @@ find_package(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
 add_executable(book_list_app main.cpp
         ui/mainwindow.cpp
         ui/mainwindow.h
-        dao/include/author_dao.h
-        dao/src/author_dao.c
-        data/db.c
-        data/db.h
-        data/execute.hpp
-        data/execute.cpp
-        models/src/author.c
-        models/src/book.c
-        models/include/author.h
-        models/include/book.h
-        models/include/publisher.h
-        models/src/publisher.c
+        src/dao/author_dao.h
+        src/dao/author_dao.c
+        src/db/db.c
+        src/db/db.h
+        src/project/execute.hpp
+        src/project/execute.cpp
+        src/models/author.c
+        src/models/book.c
+        src/models/author.h
+        src/models/book.h
+        src/models/publisher.h
+        src/models/publisher.c
 )
 add_library(
         sqlite3 STATIC third_party/sqlite/sqlite3.c
@@ -35,8 +35,9 @@ add_library(
 target_include_directories(sqlite3 PUBLIC
         third_party/sqlite
         book_list_app PUBLIC
-        "${CMAKE_CURRENT_SOURCE_DIR}/dao/include"
-        "${CMAKE_CURRENT_SOURCE_DIR}/models/include"
+        "src/dao/"
+        "src/models/"
+        "src/db"
         "${CMAKE_CURRENT_SOURCE_DIR}/data")
 
 
