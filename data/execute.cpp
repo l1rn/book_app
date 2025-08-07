@@ -24,17 +24,28 @@ int handle_open() {
             .surname = strdup("Orwell")
         };
 
+        Author new_author1 = {
+            .name = strdup("Kostolom"),
+            .surname = strdup("Mihail")
+        };
+
         if (author_dao_create(&new_author) != 0) {
             fprintf(stderr, "Failed to create author");
         }
 
-        Author *author = author_dao_find_by_id(new_author.id);
-
-        if (author == nullptr) {
-            fprintf(stderr, "Failed to select author\n");
+        if (author_dao_create(&new_author1) != 0) {
+            fprintf(stderr, "Failed to create author");
         }
-        else {
-            print_author(author);
+
+        int count = 0;
+        Author **authors = author_dao_find_all(&count);
+
+        if (authors) {
+            for (int i = 0; i < count; i++) {
+                printf("Author: %s %s\n", authors[i]->name, authors[i]->surname);
+                free_author(authors[i]);
+            }
+            free(authors);
         }
     }
     else {

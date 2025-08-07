@@ -33,6 +33,7 @@ void handle_dao_sql_error(failure_status status) {
 
 	fprintf(stderr, "%s %s\n", msg, sqlite3_errmsg(db));
 }
+
 // Create
 failure_status author_dao_create(Author *author){
 	const char *sql = "INSERT INTO Author (name, surname) VALUES (?, ?);";
@@ -58,24 +59,94 @@ failure_status author_dao_create(Author *author){
 }
 
 // Read
-// failure_status author_dao_find_all(Author **authors, int *count) {
-// 	const char *sql = "SELECT id, name, surname FROM Author";
-// 	sqlite3_stmt *stmt;
-// 	Author *author = NULL;
-// 	int rc;
-//
-// 	author = (Author*) malloc(sizeof(Author));
-// 	if (!author) {
-// 		print_error("MALLOC-FAIL: Could not allocate memory for Author struct.\n");
-// 	}
-//
-// 	if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-// 		return FAIL_PREPARE;
-// 	}
-//
-// 	sqlite3_finalize(stmt);
-// 	return FAIL_NONE;
-// }
+int author_dao_count() {
+	const char *sql = "SELECT COUNT(*) FROM Author";
+	int count = 0;
+	sqlite3_stmt *stmt;
+
+	if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+		handle_dao_sql_error(FAIL_PREPARE);
+		goto null;
+	}
+
+	int rc = sqlite3_step(stmt);
+
+	if (rc == SQLITE_ROW) {
+		count = sqlite3_column_int(stmt, 0);
+		if (!count) {
+			handle_dao_sql_error(FAIL_EXECUTE);
+			goto null;
+		}
+	}
+	else {
+		handle_dao_sql_error(FAIL_EXECUTE);
+		goto null;
+	}
+
+	return count;
+	null:
+		if (stmt) {
+			sqlite3_finalize(stmt);
+		}
+		return 0;
+}
+
+Author** author_dao_find_all(int *out_count) {
+	sqlite3_stmt *stmt = NULL;
+	int author_size = author_dao_count();
+	Author** authors = NULL;
+	int rc, i = 0;
+
+	if (author_size == 0) {
+		handle_dao_sql_error(FAIL_NOT_FOUND);
+		goto fail;
+	}
+	authors = (Author**) malloc(sizeof(Author *) * author_size);
+
+	if (!authors) {
+		handle_dao_sql_error(FAIL_MEMORY_ALLOC);
+		goto fail;
+	}
+
+	const char *sql = "SELECT id, name, surname FROM Author";
+	if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+		handle_dao_sql_error(FAIL_PREPARE);
+	}
+
+	rc = sqlite3_step(stmt);
+
+	if (rc != SQLITE_ROW){
+		handle_dao_sql_error(FAIL_EXECUTE);
+		goto fail;
+	}
+
+	while (sqlite3_step(stmt) == SQLITE_ROW) {
+		Author* author = author_create_model(
+			sqlite3_column_text(stmt, 1),
+			sqlite3_column_text(stmt,2));
+		if (!author) {
+			handle_dao_sql_error(FAIL_MEMORY_ALLOC);
+			goto fail;
+		}
+		author->id = sqlite3_column_int(stmt, 0);
+		authors[i++] = author;
+	}
+
+	sqlite3_finalize(stmt);
+	if (out_count) *out_count = i;
+	return authors;
+	fail:
+		if (stmt) sqlite3_finalize(stmt);
+		for (int j = 0; j < i; j++) {
+			if (authors[j] == NULL) {
+				handle_dao_sql_error(FAIL_NOT_FOUND);
+				return NULL;
+			}
+			free_author(authors[j]);
+		}
+		free(authors);
+		return NULL;
+}
 
 Author* author_dao_find_by_id(int id) {
 	sqlite3_stmt *stmt = NULL;

@@ -7,16 +7,12 @@ Author* author_create_model(const unsigned char *name, const unsigned char *surn
     Author *author = (Author*) malloc(sizeof(Author));
     if (!author) return NULL;
 
-    author->name = name ? strdup(name) : NULL;
-    if (!author->name && name) {
-        free(author);
-        return NULL;
-    }
+    author->name = name ? strdup((const char *)name) : NULL;
 
-    author->surname = surname ? strdup(surname) : NULL;
-    if (!author->surname && surname) {
-        free(author->name);
-        free(author);
+    author->surname = surname ? strdup((const char *)surname) : NULL;
+
+    if (!author->name && !author->surname) {
+        free_author(author);
         return NULL;
     }
     return author;
@@ -30,6 +26,10 @@ void free_author(Author *author) {
         free(author->surname);
         free(author);
     }
+}
+
+void free_authors(Author** authors) {
+
 }
 
 void print_author(const Author *author) {

@@ -15,7 +15,7 @@ private slots:
     void onButtonClicked();
 
 private:
-    QPushButton *button;
+    QPushButton *button{};
 };
 
 

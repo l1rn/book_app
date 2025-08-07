@@ -12,9 +12,10 @@ typedef enum failure_status {
     FAIL_MEMORY_ALLOC
 } failure_status;
 
-failure_status author_dao_create(Author *author);
-Author* author_dao_find_by_id(int id);
-failure_status author_dao_find_all();
-failure_status author_dao_delete_by_id(int id);
+failure_status  author_dao_create(Author *author);
+Author*          author_dao_find_by_id(int id);
+Author**        author_dao_find_all(int *out_count);
+int                  author_dao_count();
+failure_status  author_dao_delete_by_id(int id);
 
 #endif
