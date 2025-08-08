@@ -38,21 +38,10 @@ int db_open(const char *filename){
     return 0;
 }
 
-int db_check() {
-    if (db != NULL) {
-        return 0;
-    }
-    return 1;
-}
-
 int db_init(const char *schemaPath) {
     if (db == NULL) {
         fprintf(stderr, "Database not open. Call dbOpen first. \n");
         return 1;
-    }
-
-    if (readFile(schemaPath) != NULL) {
-        return 0;
     }
 
     char *schema = readFile(schemaPath);

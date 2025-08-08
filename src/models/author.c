@@ -20,16 +20,25 @@ Author* author_create_model(const unsigned char *name, const unsigned char *surn
 
 void free_author(Author *author) {
     if (author) {
-        author->name = NULL;
-        free(author->name);
-        author->surname = NULL;
-        free(author->surname);
+        if (author->name) {
+            free(author->name);
+            author->name = NULL;
+        }
+        if (author->surname) {
+            free(author->surname);
+            author->surname = NULL;
+        }
         free(author);
     }
 }
 
-void free_authors(Author** authors) {
-
+void free_authors(Author** authors, int count) {
+    if (authors) {
+        for (int i = 0; i < count; i++) {
+            free_author(authors[i]);
+        }
+        free(authors);
+    }
 }
 
 void print_author(const Author *author) {

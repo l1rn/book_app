@@ -10,6 +10,7 @@ typedef struct {
 
 Author* author_create_model(const unsigned char *name, const unsigned char *surname);
 void free_author(Author *author);
+void free_authors(Author **authors, int count);
 void print_author(const Author *author);
 
 #endif
