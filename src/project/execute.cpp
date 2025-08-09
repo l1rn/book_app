@@ -2,7 +2,7 @@
 #include <iostream>
 
 extern "C"{
-    #include "../db/db.h"
+    #include "db.h"
     #include "author_dao.h"
     #include "author.h"
 
@@ -57,10 +57,6 @@ int handle_open() {
         if (author_dao_create(&new_author2) != 0) {
             fprintf(stderr, "Failed to create author");
         }
-
-        free_author(&new_author);
-        free_author(&new_author1);
-        free_author(&new_author2);
     }
     else {
         std::cout << "Database already exists.\n";

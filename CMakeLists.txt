@@ -27,6 +27,8 @@ add_executable(book_list_app main.cpp
         src/models/book.h
         src/models/publisher.h
         src/models/publisher.c
+        src/memory/arena.c
+        src/memory/arena.h
 )
 add_library(
         sqlite3 STATIC third_party/sqlite/sqlite3.c
