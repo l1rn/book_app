@@ -40,6 +40,7 @@ target_include_directories(sqlite3 PUBLIC
         "src/dao/"
         "src/models/"
         "src/db"
+        "src/memory"
         "src/data")
 
 

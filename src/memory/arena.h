@@ -17,4 +17,7 @@ typedef struct Arena {
 } Arena;
 
 Arena* create_create();
+void arena_destroy(Arena* arena);
+void* arena_alloc(Arena* arena, size_t size);
+void arena_reset(Arena* arena);
 #endif //ARENA_H

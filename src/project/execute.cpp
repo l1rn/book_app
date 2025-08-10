@@ -11,7 +11,7 @@ extern "C"{
 }
 
 static bool file_exists(const char* path) {
-    struct stat buffer;
+    struct stat buffer{};
     return stat(path, &buffer) == 0;
 }
 
