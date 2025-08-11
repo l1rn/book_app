@@ -28,9 +28,7 @@ add_executable(book_list_app main.cpp
         src/models/publisher.h
         src/models/publisher.c
 )
-add_library(
-        sqlite3 STATIC third_party/sqlite/sqlite3.c
-        widgets)
+add_library(sqlite3 STATIC third_party/sqlite/sqlite3.c)
 
 target_include_directories(sqlite3 PUBLIC
         third_party/sqlite

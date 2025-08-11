@@ -8,10 +8,11 @@ typedef struct Publisher{
     struct Book *books;
     int bookCount;
     int bookCapacity;
-    char companyName[120];
+    char* companyName;
 } Publisher;
 
 Publisher create_publisher(const char* name);
 void print_publisher(const Publisher *publisher);
 void clear_publisher_books(Publisher *p);
+void free_publisher(Publisher *p);
 #endif
