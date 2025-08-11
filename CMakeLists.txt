@@ -31,8 +31,7 @@ add_executable(book_list_app main.cpp
         src/memory/arena.h
 )
 add_library(
-        sqlite3 STATIC third_party/sqlite/sqlite3.c
-        widgets)
+        sqlite3 STATIC third_party/sqlite/sqlite3.c)
 
 target_include_directories(sqlite3 PUBLIC
         third_party/sqlite

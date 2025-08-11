@@ -5,6 +5,7 @@ extern "C"{
     #include "db.h"
     #include "author_dao.h"
     #include "author.h"
+    #include "arena.h"
 
     #include "string.h"
     #include "sys/stat.h"
@@ -62,14 +63,22 @@ int handle_open() {
         std::cout << "Database already exists.\n";
     }
 
+    Arena *a = arena_create(ARENA_MAX_SIZE);
+    if (!a) {
+        return 1;
+    }
+
     int count = 0;
-    Author **authors = author_dao_find_all(&count);
+    Author **authors = author_dao_find_all(a, &count);
     if (authors) {
         for (int i = 0; i < count; i++) {
             printf("Author: %s %s\n", authors[i]->name, authors[i]->surname);
         }
-        free_authors(authors, count);
+        free(authors); // for arena mode
+        authors = NULL;
     }
+    arena_reset(a);
+    arena_destroy(a);
     db_close();
     return 0;
 }

@@ -125,30 +125,31 @@ int author_dao_count() {
 		return 0;
 }
 
-Author** author_dao_find_all(int *out_count) {
+Author** author_dao_find_all(Arena *a, int *out_count) {
+	if (!a) return NULL;
+
 	sqlite3_stmt *stmt = NULL;
 	int author_size = author_dao_count();
-	Author** authors = NULL;
 	int rc, i = 0;
 
 	if (author_size == 0) {
 		handle_dao_sql_error(FAIL_NOT_FOUND);
 		goto fail;
 	}
-	authors = (Author**) malloc(sizeof(Author *) * author_size);
 
-	if (!authors) {
-		handle_dao_sql_error(FAIL_MEMORY_ALLOC);
-		goto fail;
-	}
+	Author** authors = (Author**) malloc(sizeof(Author *) * author_size);
+
+	if (!authors) { handle_dao_sql_error(FAIL_MEMORY_ALLOC); goto fail;}
 
 	const char *sql = "SELECT id, name, surname FROM Author";
 	if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
 		handle_dao_sql_error(FAIL_PREPARE);
+		goto fail;
 	}
 
 	while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
-		Author* author = author_create_model(
+		Author* author = author_create_in_arena(
+			a,
 			sqlite3_column_text(stmt, 1),
 			sqlite3_column_text(stmt,2));
 		if (!author) {
