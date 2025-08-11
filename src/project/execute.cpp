@@ -2,16 +2,17 @@
 #include <iostream>
 
 extern "C"{
-    #include "../db/db.h"
+    #include "db.h"
     #include "author_dao.h"
     #include "author.h"
+    #include "arena.h"
 
     #include "string.h"
     #include "sys/stat.h"
 }
 
 static bool file_exists(const char* path) {
-    struct stat buffer;
+    struct stat buffer{};
     return stat(path, &buffer) == 0;
 }
 
@@ -57,23 +58,27 @@ int handle_open() {
         if (author_dao_create(&new_author2) != 0) {
             fprintf(stderr, "Failed to create author");
         }
-
-        free_author(&new_author);
-        free_author(&new_author1);
-        free_author(&new_author2);
     }
     else {
         std::cout << "Database already exists.\n";
     }
 
+    Arena *a = arena_create(ARENA_MAX_SIZE);
+    if (!a) {
+        return 1;
+    }
+
     int count = 0;
-    Author **authors = author_dao_find_all(&count);
+    Author **authors = author_dao_find_all(a, &count);
     if (authors) {
         for (int i = 0; i < count; i++) {
             printf("Author: %s %s\n", authors[i]->name, authors[i]->surname);
         }
-        free_authors(authors, count);
+        free(authors); // for arena mode
+        authors = NULL;
     }
+    arena_reset(a);
+    arena_destroy(a);
     db_close();
     return 0;
 }

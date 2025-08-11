@@ -1,7 +1,22 @@
 #include "author.h"
+#include "arena.h"
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+Author* author_create_in_arena(Arena* arena, const unsigned char* name, const unsigned char* surname) {
+    Author* a = (Author*) arena_alloc(arena, sizeof(Author));
+    if (!a) return NULL;
+    a->id = -1;
+    a->name = arena_strdup(arena, name);
+    a->surname = arena_strdup(arena, surname);
+
+    if ((name && ! a->name) || (surname && !a->surname)) {
+        return NULL;
+    }
+    return a;
+}
 
 Author* author_create_model(const unsigned char *name, const unsigned char *surname){
     Author *author = (Author*) malloc(sizeof(Author));

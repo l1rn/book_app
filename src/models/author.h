@@ -1,6 +1,7 @@
 
 #ifndef AUTHOR_H
 #define AUTHOR_H
+#include "arena.h"
 
 typedef struct {
     int id;
@@ -13,4 +14,5 @@ void free_author(Author *author);
 void free_authors(Author **authors, int count);
 void print_author(const Author *author);
 
+Author* author_create_in_arena(Arena* arena, const unsigned char* name, const unsigned char* surname);
 #endif
