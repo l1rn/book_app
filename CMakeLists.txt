@@ -13,8 +13,6 @@ set(CMAKE_AUTOUIC ON)
 find_package(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
 
 add_executable(book_list_app main.cpp
-        ui/mainwindow.cpp
-        ui/mainwindow.h
         src/dao/author_dao.h
         src/dao/author_dao.c
         src/db/db.c
@@ -27,6 +25,8 @@ add_executable(book_list_app main.cpp
         src/models/book.h
         src/models/publisher.h
         src/models/publisher.c
+        ui/main_window.cpp
+        ui/main_window.cpp
 )
 add_library(
         sqlite3 STATIC third_party/sqlite/sqlite3.c
@@ -38,7 +38,8 @@ target_include_directories(sqlite3 PUBLIC
         "src/dao/"
         "src/models/"
         "src/db"
-        "src/data")
+        "src/data"
+        "ui")
 
 
 target_link_libraries(

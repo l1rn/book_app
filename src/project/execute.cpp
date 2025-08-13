@@ -1,8 +1,10 @@
 
 #include <iostream>
 
+#include "main_window.hpp"
+
 extern "C"{
-    #include "../db/db.h"
+    #include "db.h"
     #include "author_dao.h"
     #include "author.h"
 
@@ -10,12 +12,45 @@ extern "C"{
     #include "sys/stat.h"
 }
 
-static bool file_exists(const char* path) {
-    struct stat buffer;
-    return stat(path, &buffer) == 0;
+namespace {
+    bool file_exists(const char* path) {
+        struct stat buffer;
+        return stat(path, &buffer) == 0;
+    }
+
+    void init_sample_authors() {
+        Author sample_authors[] = {
+        { .name = strdup("George"), .surname = strdup("Orwell") },
+        { .name = strdup("Kostolom"), .surname = strdup("Mihail") },
+        { .name = strdup("Kostolom"), .surname = strdup("LOLOLOWKA") }
+        };
+
+        size_t count = std::size(sample_authors);
+
+        for (size_t i = 0; i < count; i++) {
+            if (author_dao_create(&sample_authors[i]) != 0) {
+                std::cerr << "Failed to create author: "
+                    << sample_authors->name << ", "
+                    << sample_authors->surname << "\n";
+            }
+            free_author(&sample_authors[i]);
+        }
+    }
+
+    void print_authors() {
+        int count = 0;
+        Author **authors = author_dao_find_all(&count);
+        if (authors) {
+            for (int i = 0; i < count; i++) {
+                printf("Author: %s %s\n", authors[i]->name, authors[i]->surname);
+            }
+            free_authors(authors, count);
+        }
+    }
 }
 
-int handle_open() {
+
+int handle_db() {
     const char *db_path = "../data/local.db";
     bool need_init = !file_exists(db_path);
     if (db_open(db_path) != 0) {
@@ -30,50 +65,11 @@ int handle_open() {
             db_close();
             return 1;
         }
-
-        Author new_author = {
-            .name = strdup("George"),
-            .surname = strdup("Orwell")
-        };
-
-        Author new_author1 = {
-            .name = strdup("Kostolom"),
-            .surname = strdup("Mihail")
-        };
-
-        Author new_author2 = {
-            .name = strdup("Kostolom"),
-            .surname = strdup("LOLOLOWKA")
-        };
-
-        if (author_dao_create(&new_author) != 0) {
-            fprintf(stderr, "Failed to create author");
-        }
-
-        if (author_dao_create(&new_author1) != 0) {
-            fprintf(stderr, "Failed to create author");
-        }
-
-        if (author_dao_create(&new_author2) != 0) {
-            fprintf(stderr, "Failed to create author");
-        }
-
-        free_author(&new_author);
-        free_author(&new_author1);
-        free_author(&new_author2);
+        init_sample_authors();
     }
     else {
         std::cout << "Database already exists.\n";
     }
-
-    int count = 0;
-    Author **authors = author_dao_find_all(&count);
-    if (authors) {
-        for (int i = 0; i < count; i++) {
-            printf("Author: %s %s\n", authors[i]->name, authors[i]->surname);
-        }
-        free_authors(authors, count);
-    }
-    db_close();
+    print_authors();
     return 0;
 }

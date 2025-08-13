@@ -1,8 +1,8 @@
 
 #ifndef EXECUTE_H
 #define EXECUTE_H
-#include "../db/db.h"
 
-int handle_open();
+int       handle_db();
+void    handle_window();
 
 #endif
