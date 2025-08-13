@@ -12,6 +12,7 @@ int main(int argc, char *argv[]) {
     if (handle_db() == 1) {
         std::cerr << "Database failed\n";
     }
+
     QApplication app(argc, argv);
     QMainWindow window;
     window.setGeometry(100, 100, 600, 400);
