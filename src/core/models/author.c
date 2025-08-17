@@ -1,5 +1,5 @@
 #include "author.h"
-#include "arena.h"
+#include "arena_api.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -8,7 +8,6 @@
 Author* author_create_in_arena(Arena* arena, const unsigned char* name, const unsigned char* surname) {
     Author* a = (Author*) arena_alloc(arena, sizeof(Author));
     if (!a) return NULL;
-    a->id = -1;
     a->name = arena_strdup(arena, name);
     a->surname = arena_strdup(arena, surname);
 

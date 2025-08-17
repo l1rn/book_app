@@ -1,6 +1,5 @@
 #include <sqlite3.h>
 #include <stdio.h>
-#include <string.h>
 
 #include "author_dao.h"
 
@@ -125,6 +124,7 @@ int author_dao_count() {
 		return 0;
 }
 
+// returns objects in arena, do not free individually
 Author** author_dao_find_all(Arena *a, int *out_count) {
 	if (!a) return NULL;
 
@@ -170,6 +170,8 @@ Author** author_dao_find_all(Arena *a, int *out_count) {
 	return authors;
 	fail:
 		if (stmt) sqlite3_finalize(stmt);
+		if (authors == NULL) return NULL;
+
 		for (int j = 0; j < i; j++) {
 			if (authors[j] == NULL) {
 				handle_dao_sql_error(FAIL_NOT_FOUND);
@@ -181,19 +183,13 @@ Author** author_dao_find_all(Arena *a, int *out_count) {
 		return NULL;
 }
 
-Author* author_dao_find_by_id(int id) {
+// caller owns the object, must free
+Author* author_dao_find_by_id(Arena *a, int id) {
+	if (!a) return NULL;
+
 	sqlite3_stmt *stmt = NULL;
 	Author *author = NULL;
 	int rc;
-
-	author = (Author *) malloc(sizeof(Author));
-	if (!author) {
-		handle_dao_sql_error(FAIL_MEMORY_ALLOC);
-		goto fail;
-	}
-
-	author->name = NULL;
-	author->surname = NULL;
 
 	const char *sql = "SELECT *  FROM Author WHERE id =?";
 
@@ -209,12 +205,13 @@ Author* author_dao_find_by_id(int id) {
 
 	rc = sqlite3_step(stmt);
 	if (rc == SQLITE_ROW) {
-		author = author_create_model(sqlite3_column_text(stmt, 1), sqlite3_column_text(stmt, 2));
+		author = author_create_in_arena(a, sqlite3_column_text(stmt, 1), sqlite3_column_text(stmt, 2));
 
-		if (!author->name || !author->surname) {
-			handle_dao_sql_error(FAIL_EXECUTE);
+		if (!author) {
+			handle_dao_sql_error(FAIL_MEMORY_ALLOC);
 			goto fail;
 		}
+		author->id = sqlite3_column_int(stmt, 0);
 	}
 	else {
 		handle_dao_sql_error(FAIL_EXECUTE);
@@ -227,11 +224,6 @@ Author* author_dao_find_by_id(int id) {
 	fail:
 		if (stmt) {
 			sqlite3_finalize(stmt);
-		}
-		if (author) {
-			free(author->name);
-			free(author->surname);
-			free(author);
 		}
 		return NULL;
 }
@@ -269,41 +261,41 @@ Author* author_dao_update(Author *author, const unsigned char* name, const unsig
 		return NULL;
 }
 
-// Delete
-failure_status  author_dao_delete_by_id(int id) {
-	sqlite3_stmt *stmt = NULL;
-	Author *author = NULL;
-
-	author = author_dao_find_by_id(id);
-	if (!author) {
-		return FAIL_NOT_FOUND;
-	}
-
-	if (author_dao_check_existence((const unsigned char *)author->name, (const unsigned char *) author->surname) == 0) {
-		return FAIL_NOT_FOUND;
-	}
-
-	const char *sql = "DELETE FROM Author WHERE id = ?";
-
-	if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-		free_author(author);
-		return FAIL_PREPARE;
-	}
-
-	if (sqlite3_bind_int(stmt, 1, id) != SQLITE_OK) {
-		free_author(author);
-		return FAIL_BIND;
-	}
-
-	if (sqlite3_step(stmt) != SQLITE_DONE) {
-		free_author(author);
-		return FAIL_EXECUTE;
-	}
-
-	sqlite3_finalize(stmt);
-	printf("Author: %s - %s was deleted", author->name, author->surname);
-	return FAIL_NONE;
-}
+// // Delete
+// failure_status  author_dao_delete_by_id(int id) {
+// 	sqlite3_stmt *stmt = NULL;
+// 	Author *author = NULL;
+//
+// 	author = author_dao_find_by_id(id);
+// 	if (!author) {
+// 		return FAIL_NOT_FOUND;
+// 	}
+//
+// 	if (author_dao_check_existence((const unsigned char *)author->name, (const unsigned char *) author->surname) == 0) {
+// 		return FAIL_NOT_FOUND;
+// 	}
+//
+// 	const char *sql = "DELETE FROM Author WHERE id = ?";
+//
+// 	if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+// 		free_author(author);
+// 		return FAIL_PREPARE;
+// 	}
+//
+// 	if (sqlite3_bind_int(stmt, 1, id) != SQLITE_OK) {
+// 		free_author(author);
+// 		return FAIL_BIND;
+// 	}
+//
+// 	if (sqlite3_step(stmt) != SQLITE_DONE) {
+// 		free_author(author);
+// 		return FAIL_EXECUTE;
+// 	}
+//
+// 	sqlite3_finalize(stmt);
+// 	printf("Author: %s - %s was deleted", author->name, author->surname);
+// 	return FAIL_NONE;
+// }
 
 failure_status author_dao_delete_all() {
 	sqlite3_stmt *stmt = NULL;

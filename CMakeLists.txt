@@ -20,12 +20,6 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
 
-if(MSVC)
-    add_compile_options(/W4 /WX)
-else ()
-    add_compile_options(-Wall -Wextra -Wpedantic -Werror)
-endif ()
-
 if(BUILD_WITH_ASAN)
     add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
     add_link_options(-fsanitize=address)
@@ -33,6 +27,7 @@ endif ()
 
 include_directories(
         src/
+        third_party/hash
         third_party/sqlite
 )
 
@@ -43,29 +38,39 @@ set_target_properties(sqlite3 PROPERTIES FOLDER "ThirdParty")
 
 ## Core components lib
 add_library(app_core STATIC
-        src/dao/author_dao.h
-        src/dao/author_dao.c
-        src/db/db.c
-        src/db/db.h
+        third_party/hash/uthash.h
+        src/core/dao/author_dao.h
+        src/core/dao/author_dao.c
+        src/core/db/db.c
+        src/core/db/db.h
         src/project/execute.hpp
         src/project/execute.cpp
-        src/models/author.c
-        src/models/book.c
-        src/models/author.h
-        src/models/book.h
-        src/models/publisher.h
-        src/models/publisher.c
-        src/memory/arena.c
-        src/memory/arena.h
+        src/core/models/author.c
+        src/core/models/book.c
+        src/core/models/author.h
+        src/core/models/book.h
+        src/core/models/publisher.h
+        src/core/models/publisher.c
+        src/core/memory/arena_api.c
+        src/core/memory/arena_api.h
+        src/services/arena_guard.cpp
+        src/services/arena_guard.hpp
+        src/services/author_service.cpp
+        src/services/author_service.hpp
 )
+
 target_include_directories(app_core PUBLIC
     src/
-    src/memory/
-    src/models/
-    src/db/
-    src/dao/
-    src/project
-    ui/)
+    "src/core/memory/"
+    "src/core/models/"
+    "src/core/db/"
+    "src/core/dao/"
+    "src/project"
+    "src/services"
+    "ui/"
+    "third_party"
+)
+
 target_link_libraries(app_core PRIVATE sqlite3)
 set_target_properties(app_core PROPERTIES FOLDER "Libraries")
 
@@ -74,6 +79,7 @@ add_library(app_ui STATIC
     ui/main_window.cpp
     ui/main_window.hpp
 )
+
 target_include_directories(app_ui PUBLIC ui/)
 target_link_libraries(app_ui PRIVATE Qt6::Widgets app_core)
 set_target_properties(app_ui PROPERTIES FOLDER "Libraries")

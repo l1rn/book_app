@@ -1,6 +1,9 @@
 
 #include <iostream>
 
+#include "execute.hpp"
+#include "author_service.hpp"
+
 extern "C"{
     #include "db.h"
     #include "author_dao.h"
@@ -10,45 +13,36 @@ extern "C"{
     #include "sys/stat.h"
 }
 
-namespace {
-    bool file_exists(const char* path) {
-        struct stat buffer;
-        return stat(path, &buffer) == 0;
-    }
+Execute::Execute(size_t arena_size) {
 
-    void init_sample_authors() {
-        Author sample_authors[] = {
+}
+
+
+bool Execute::file_exists(const char* path) {
+    struct stat buffer;
+    return stat(path, &buffer) == 0;
+}
+
+void Execute::init_sample_authors() {
+    Author sample_authors[] = {
         { .id = 0, .name = strdup("George"), .surname = strdup("Orwell") },
         { .id = 0, .name = strdup("Kostolom"), .surname = strdup("Mihail") },
         { .id = 0, .name = strdup("Kostolom"), .surname = strdup("LOLOLOWKA") }
-        };
+    };
 
-        size_t count = std::size(sample_authors);
+    size_t count = std::size(sample_authors);
 
-        for (size_t i = 0; i < count; i++) {
-            if (author_dao_create(&sample_authors[i]) != 0) {
-                std::cerr << "Failed to create author: "
-                    << sample_authors->name << ", "
-                    << sample_authors->surname << "\n";
-            }
-            free_author(&sample_authors[i]);
+    for (size_t i = 0; i < count; i++) {
+        if (author_dao_create(&sample_authors[i]) != 0) {
+            std::cerr << "Failed to create author: "
+                << sample_authors->name << ", "
+                << sample_authors->surname << "\n";
         }
-    }
-
-    void print_authors(Arena *a) {
-        int count = 0;
-        Author **authors = author_dao_find_all(a, &count);
-        if (authors) {
-            for (int i = 0; i < count; i++) {
-                printf("Author: %s %s\n", authors[i]->name, authors[i]->surname);
-            }
-            free(authors);
-            authors = NULL;
-        }
+        free_author(&sample_authors[i]);
     }
 }
 
-void open_db() {
+void Execute::open_db() {
     const char *db_path = "../data/local.db";
     bool need_init = !file_exists(db_path);
     if (db_open(db_path) != 0) {
@@ -70,15 +64,12 @@ void open_db() {
     }
 }
 
-int handle_open_app(Arena *a) {
+int Execute::open_app() {
     open_db();
-    print_authors(a);
     return 0;
 }
 
-int handle_close_app(Arena *a) {
-    arena_reset(a);
-    arena_destroy(a);
+int Execute::close_app() {
     db_close();
     return 0;
 }

@@ -1,4 +1,4 @@
-#include "arena.h"
+#include "arena_api.h"
 
 #include <stdio.h>
 #include <stdlib.h>

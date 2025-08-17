@@ -1,7 +1,7 @@
 
 #ifndef AUTHOR_H
 #define AUTHOR_H
-#include "arena.h"
+#include "arena_api.h"
 
 typedef struct {
     int id;
