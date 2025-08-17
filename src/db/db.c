@@ -9,7 +9,7 @@ static char* readFile(const char* path) {
     if (!file) return NULL;
 
     fseek(file, 0, SEEK_END);
-    long len = ftell(file);
+    size_t len = ftell(file);
     rewind(file);
 
     char* buffer = malloc(len + 1);

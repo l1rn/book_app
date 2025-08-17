@@ -1,8 +1,6 @@
 
 #include <iostream>
 
-#include "main_window.hpp"
-
 extern "C"{
     #include "db.h"
     #include "author_dao.h"
@@ -20,9 +18,9 @@ namespace {
 
     void init_sample_authors() {
         Author sample_authors[] = {
-        { .name = strdup("George"), .surname = strdup("Orwell") },
-        { .name = strdup("Kostolom"), .surname = strdup("Mihail") },
-        { .name = strdup("Kostolom"), .surname = strdup("LOLOLOWKA") }
+        { .id = 0, .name = strdup("George"), .surname = strdup("Orwell") },
+        { .id = 0, .name = strdup("Kostolom"), .surname = strdup("Mihail") },
+        { .id = 0, .name = strdup("Kostolom"), .surname = strdup("LOLOLOWKA") }
         };
 
         size_t count = std::size(sample_authors);
@@ -37,39 +35,50 @@ namespace {
         }
     }
 
-    void print_authors() {
+    void print_authors(Arena *a) {
         int count = 0;
-        Author **authors = author_dao_find_all(&count);
+        Author **authors = author_dao_find_all(a, &count);
         if (authors) {
             for (int i = 0; i < count; i++) {
                 printf("Author: %s %s\n", authors[i]->name, authors[i]->surname);
             }
-            free_authors(authors, count);
+            free(authors);
+            authors = NULL;
         }
     }
 }
 
-
-int handle_db() {
+void open_db() {
     const char *db_path = "../data/local.db";
     bool need_init = !file_exists(db_path);
     if (db_open(db_path) != 0) {
         std::cerr << "Database open failed\n";
         db_close();
-        return 1;
+        return;
     }
 
     if (need_init) {
         if (db_init("../data/schemes/001_init.sql") != 0) {
             std::cerr << "Database schema init failed.\n";
             db_close();
-            return 1;
+            return;
         }
         init_sample_authors();
     }
     else {
         std::cout << "Database already exists.\n";
     }
-    print_authors();
+}
+
+int handle_open_app(Arena *a) {
+    open_db();
+    print_authors(a);
+    return 0;
+}
+
+int handle_close_app(Arena *a) {
+    arena_reset(a);
+    arena_destroy(a);
+    db_close();
     return 0;
 }

@@ -5,11 +5,14 @@
 #include "src/project/execute.hpp"
 
 extern "C" {
-    #include "db.h"
+    #include "memory/arena.h"
 }
 
 int main(int argc, char *argv[]) {
-    if (handle_db() == 1) {
+    Arena *a = arena_create(ARENA_MAX_SIZE);
+    if (!a) return 1;
+
+    if (handle_open_app(a) != 0) {
         std::cerr << "Database failed\n";
     }
 
@@ -18,6 +21,6 @@ int main(int argc, char *argv[]) {
     window.setGeometry(100, 100, 600, 400);
     window.show();
     auto ret = app.exec();
-    db_close();
+    handle_close_app(a);
     return ret;
 }

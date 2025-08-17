@@ -1,18 +1,48 @@
-cmake_minimum_required(VERSION 3.30)
+cmake_minimum_required(VERSION 3.20)
 project(book_list_app LANGUAGES C CXX)
+
+set(VERSION_MAJOR 1)
+set(VERSION_MINOR 1)
+set(VERSION_PATCH 0)
 
 set(CMAKE_PREFIX_PATH "C:/Qt/6.9.1/mingw_64")
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-find_package(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
 
-add_executable(book_list_app main.cpp
+if(MSVC)
+    add_compile_options(/W4 /WX)
+else ()
+    add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+endif ()
+
+if(BUILD_WITH_ASAN)
+    add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
+    add_link_options(-fsanitize=address)
+endif ()
+
+include_directories(
+        src/
+        third_party/sqlite
+)
+
+## Third party lib
+add_library(sqlite3 STATIC third_party/sqlite/sqlite3.c)
+target_include_directories(sqlite3 PUBLIC third_party/sqlite)
+set_target_properties(sqlite3 PROPERTIES FOLDER "ThirdParty")
+
+## Core components lib
+add_library(app_core STATIC
         src/dao/author_dao.h
         src/dao/author_dao.c
         src/db/db.c
@@ -25,55 +55,66 @@ add_executable(book_list_app main.cpp
         src/models/book.h
         src/models/publisher.h
         src/models/publisher.c
-        ui/main_window.cpp
-        ui/main_window.cpp
+        src/memory/arena.c
+        src/memory/arena.h
 )
-add_library(
-        sqlite3 STATIC third_party/sqlite/sqlite3.c
-        widgets)
+target_include_directories(app_core PUBLIC
+    src/
+    src/memory/
+    src/models/
+    src/db/
+    src/dao/
+    src/project
+    ui/)
+target_link_libraries(app_core PRIVATE sqlite3)
+set_target_properties(app_core PROPERTIES FOLDER "Libraries")
 
-target_include_directories(sqlite3 PUBLIC
-        third_party/sqlite
-        book_list_app PUBLIC
-        "src/dao/"
-        "src/models/"
-        "src/db"
-        "src/data"
-        "ui")
-
-
-target_link_libraries(
-        book_list_app
-        PRIVATE
-            Qt::Core Qt::Gui Qt::Widgets
-            sqlite3
+## UI components lib
+add_library(app_ui STATIC
+    ui/main_window.cpp
+    ui/main_window.hpp
 )
+target_include_directories(app_ui PUBLIC ui/)
+target_link_libraries(app_ui PRIVATE Qt6::Widgets app_core)
+set_target_properties(app_ui PROPERTIES FOLDER "Libraries")
 
-if (WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+# Main executable
+add_executable(book_list_app main.cpp)
+target_link_libraries(book_list_app PRIVATE app_ui Qt6::Widgets)
+set_target_properties(book_list_app PROPERTIES FOLDER "Applications")
+
+install(TARGETS book_list_app
+        RUNTIME DESTINATION bin
+        BUNDLE DESTINATION .)
+
+if(WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     set(DEBUG_SUFFIX)
-    if (MSVC AND CMAKE_BUILD_TYPE MATCHES "Debug")
+    if(MSVC AND CMAKE_BUILD_TYPE MATCHES "Debug")
         set(DEBUG_SUFFIX "d")
-    endif ()
-    set(QT_INSTALL_PATH "${CMAKE_PREFIX_PATH}")
-    if (NOT EXISTS "${QT_INSTALL_PATH}/bin")
-        set(QT_INSTALL_PATH "${QT_INSTALL_PATH}/..")
-        if (NOT EXISTS "${QT_INSTALL_PATH}/bin")
-            set(QT_INSTALL_PATH "${QT_INSTALL_PATH}/..")
-        endif ()
-    endif ()
-    if (EXISTS "${QT_INSTALL_PATH}/plugins/platforms/qwindows${DEBUG_SUFFIX}.dll")
-        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    endif()
+
+    find_package(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
+    get_target_property(QtCore_location Qt6::Core LOCATION)
+    get_filename_component(QT_INSTALL_PATH "${QtCore_location}" DIRECTORY)
+    get_filename_component(QT_INSTALL_PATH "${QT_INSTALL_PATH}" DIRECTORY)
+
+    if(EXISTS "${QT_INSTALL_PATH}/plugins/platforms/qwindows${DEBUG_SUFFIX}.dll")
+        add_custom_command(TARGET book_list_app POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E make_directory
-                "$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins/platforms/")
-        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                "$<TARGET_FILE_DIR:book_list_app>/plugins/platforms/"
+        )
+        add_custom_command(TARGET book_list_app POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy
                 "${QT_INSTALL_PATH}/plugins/platforms/qwindows${DEBUG_SUFFIX}.dll"
-                "$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins/platforms/")
-    endif ()
-    foreach (QT_LIB Core Gui Widgets)
-        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+                "$<TARGET_FILE_DIR:book_list_app>/plugins/platforms/"
+        )
+    endif()
+
+    foreach(QT_LIB Core Gui Widgets)
+        add_custom_command(TARGET book_list_app POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy
                 "${QT_INSTALL_PATH}/bin/Qt6${QT_LIB}${DEBUG_SUFFIX}.dll"
-                "$<TARGET_FILE_DIR:${PROJECT_NAME}>")
-    endforeach (QT_LIB)
-endif ()
+                "$<TARGET_FILE_DIR:book_list_app>"
+        )
+    endforeach()
+endif()
