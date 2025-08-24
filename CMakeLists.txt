@@ -43,8 +43,8 @@ add_library(app_core STATIC
         src/core/dao/author_dao.c
         src/core/db/db.c
         src/core/db/db.h
-        src/project/ExecuteManager.hpp
-        src/project/ExecuteManager.cpp
+        src/project/ApplicationManager.hpp
+        src/project/ApplicationManager.cpp
         src/core/models/author.c
         src/core/models/book.c
         src/core/models/author.h

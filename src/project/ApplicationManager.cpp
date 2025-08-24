@@ -1,7 +1,7 @@
 
 #include <iostream>
 
-#include "ExecuteManager.hpp"
+#include "ApplicationManager.hpp"
 #include "AuthorService.hpp"
 
 extern "C"{
@@ -11,17 +11,17 @@ extern "C"{
     #include "sys/stat.h"
 }
 
-ExecuteManager::ExecuteManager(size_t arena_size, Environment env) : env_(env) {
+ApplicationManager::ApplicationManager(size_t arena_size, Environment env) : env_(env) {
 
 }
 
 
-bool ExecuteManager::file_exists(const char* path) {
+bool ApplicationManager::file_exists(const char* path) {
     struct stat buffer;
     return stat(path, &buffer) == 0;
 }
 
-void ExecuteManager::init_sample_authors() {
+void ApplicationManager::init_sample_authors() {
     Author sample_authors[] = {
         { .id = 0, .name = strdup("George"), .surname = strdup("Orwell") },
         { .id = 0, .name = strdup("Kostolom"), .surname = strdup("Mihail") },
@@ -31,7 +31,7 @@ void ExecuteManager::init_sample_authors() {
     size_t count = std::size(sample_authors);
 }
 
-void ExecuteManager::open_db() {
+void ApplicationManager::open_db() {
     const char *db_path = nullptr;
     const char *schema_path = nullptr;
 
@@ -63,16 +63,25 @@ void ExecuteManager::open_db() {
     }
 }
 
-void ExecuteManager::close_db() {
+Arena *ApplicationManager::get_arena() {
+    return arena_.get();
+}
+
+ArenaGuard &ApplicationManager::get_arena_guard() {
+    return arena_;
+}
+
+
+void ApplicationManager::close_db() {
     db_close(app_db_context);
 }
 
-int ExecuteManager::open_app() {
+int ApplicationManager::open_app() {
     open_db();
     return 0;
 }
 
-int ExecuteManager::close_app() {
+int ApplicationManager::close_app() {
     close_db();
     return 0;
 }

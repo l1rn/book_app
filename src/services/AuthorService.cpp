@@ -6,7 +6,7 @@ extern "C"{
 #include "author_dao.h"
 }
 
-AuthorService::AuthorService(DAOContext *ctx, size_t arena_size) : ctx_(ctx) {
+AuthorService::AuthorService(DAOContext *ctx, Arena *arena) : ctx_(ctx), arena_(arena) {
     if (!ctx_) {
         std::cerr << "Invalid DAOContext provided to Author Service";
     }
@@ -26,7 +26,7 @@ Author AuthorService::createAuthor(std::string name, std::string surname) {
 
 void AuthorService::getAllAuthors(std::vector<Author>& out_authors) {
     int count = 0;
-    Author** authors = author_dao_find_all(ctx_, arena_.get(), &count);
+    Author** authors = author_dao_find_all(ctx_, arena_, &count);
     out_authors.reserve(count);
 
     for (int i = 0; i < count; i++) {

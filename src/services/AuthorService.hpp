@@ -11,7 +11,7 @@ extern "C"{
 
 class AuthorService {
 public:
-    explicit AuthorService(DAOContext *ctx, size_t arena_size = 64*1024);
+    AuthorService(DAOContext *ctx, Arena *arena);
 
     void getAllAuthors(std::vector<Author>& out_authors);
     Author createAuthor(std::string name, std::string surname);
@@ -20,6 +20,6 @@ public:
 
 private:
     DAOContext *ctx_;
-    ArenaGuard arena_;
+    Arena *arena_;
 };
 #endif //BOOK_LIST_APP_AUTHOR_SERVICE_HPP
