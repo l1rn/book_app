@@ -18,7 +18,6 @@ void arena_destroy(Arena *a) {
     if (!a) return;
     free(a->buffer);
     free(a);
-    printf("System: Arena destroyed and all memory freed. \n");
 }
 
 void* arena_alloc(Arena *a, size_t size) {

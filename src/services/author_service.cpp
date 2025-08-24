@@ -3,7 +3,6 @@
 #include "author_service.hpp"
 
 extern "C"{
-#include "author.h"
 #include "author_dao.h"
 }
 
@@ -11,19 +10,22 @@ AuthorService::AuthorService(size_t arena_size) {
 
 }
 
-void AuthorService::printAllAuthors() {
+std::vector<Author> AuthorService::get_all_authors() {
     int count = 0;
     Author** authors = author_dao_find_all(arena_.get(), &count);
-
-    if (!authors) {
-        std::cerr << "No authors found or error occurred\n";
-        return;
-    }
+    std::vector<Author> authors_vector;
+    authors_vector.reserve(count);
 
     for (int i = 0; i < count; i++) {
-        std::cout << "Author[" << i << "]:"
-            << authors[i]->name << " "
-            << authors[i]->surname << "\n";
+        authors_vector.push_back(*authors[i]);
+    }
+    return authors_vector;
+}
+
+void AuthorService::print_all_authors() {
+    std::vector<Author> authors = get_all_authors();
+    for (const auto& author : authors) {
+        std::cout << author.surname << "\n";
     }
 }
 

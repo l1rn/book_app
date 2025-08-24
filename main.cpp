@@ -17,8 +17,8 @@ int main(int argc, char *argv[]) {
     QMainWindow window;
     window.setGeometry(100, 100, 600, 400);
     window.show();
-    author_service.printAllAuthors();
+    author_service.print_all_authors();
     auto ret = app.exec();
-    execute.close_app();
+    Execute::close_app();
     return ret;
 }
