@@ -255,7 +255,7 @@ Author* author_dao_update(sqlite3 *db, Author *author, const unsigned char* name
 
 	if (sqlite3_bind_text(stmt, 1, (const char *) name, -1, SQLITE_STATIC) != SQLITE_OK ||
 		sqlite3_bind_text(stmt, 2,(const char *) surname, -1, SQLITE_STATIC) != SQLITE_OK ||
-		sqlite3_bind_int(stmt, 3, author->id) != SQLITE_OK) {
+		sqlite3_bind_int64(stmt, 3, author->id) != SQLITE_OK) {
 		handle_dao_sql_error(DAO_ERROR_BIND);
 		goto fail;
 	}

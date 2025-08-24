@@ -15,4 +15,5 @@ Publisher create_publisher(const char* name);
 void print_publisher(const Publisher *publisher);
 void clear_publisher_books(Publisher *p);
 void free_publisher(Publisher *p);
+
 #endif
