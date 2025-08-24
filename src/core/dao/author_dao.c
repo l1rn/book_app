@@ -5,30 +5,27 @@
 
 #include <stdlib.h>
 
-#include "author.h"
-#include "db.h"
+int author_dao_check_existence(sqlite3 *db, const unsigned char *name, const unsigned char *surname);
 
-int author_dao_check_existence(const unsigned char *name, const unsigned char *surname);
-
-void handle_dao_sql_error(failure_status status) {
+void handle_dao_sql_error(dao_status status) {
 	const char *msg = NULL;
 	switch (status) {
-		case FAIL_PREPARE:
+		case DAO_ERROR_PREPARE:
 			msg = "SQL prepare failed.";
 			break;
-		case FAIL_EXECUTE:
+		case DAO_ERROR_EXECUTE:
 			msg = "SQL execution failed.";
 			break;
-		case FAIL_BIND:
+		case DAO_ERROR_BIND:
 			msg = "SQL bind failed.";
 			break;
-		case FAIL_NOT_FOUND:
+		case DAO_ERROR_NOT_FOUND:
 			msg  = "Record not found.";
 			break;
-		case FAIL_MEMORY_ALLOC:
+		case DAO_ERROR_UNKNOWN:
 			msg = "Unable to allocate memory";
 			break;
-		case FAIL_ALREADY_EXIST:
+		case DAO_ALREADY_EXIST:
 			msg = "Record already exist";
 			break;
 		default:
@@ -36,48 +33,64 @@ void handle_dao_sql_error(failure_status status) {
 			break;
 	}
 
-	fprintf(stderr, "%s %s\n", msg, sqlite3_errmsg(db));
+	fprintf(stderr, "%s %s\n", msg);
 }
 
 // Create
-failure_status author_dao_create(Author *author){
-	if (author_dao_check_existence((const unsigned char *) author->name, (const unsigned char *) author->surname) == 1) {
-		handle_dao_sql_error(FAIL_ALREADY_EXIST);
-		return FAIL_NONE;
+dao_status author_dao_create(DAOContext *ctx, const char* name, const char* surname, int64_t *out_new_id){
+	if (ctx == NULL || out_new_id == NULL) {
+		return DAO_ERROR_INVALID_ARGS;
 	}
+
+	sqlite3 *db = db_get_handle(ctx);
+	if (!db | !name | !surname) {
+		return DAO_ERROR_INVALID_ARGS;
+	}
+
+	if (author_dao_check_existence(db, (const unsigned char *) name, (const unsigned char *) surname) == 1) {
+		return DAO_ALREADY_EXIST;
+	}
+	sqlite3_stmt *stmt = NULL;
 	const char *sql = "INSERT INTO Author (name, surname) VALUES (?, ?);";
-	sqlite3_stmt *stmt;
+	dao_status status = DAO_ERROR_UNKNOWN;
 
-	if(sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK){
-		return FAIL_PREPARE;
-	}
+	do {
+		if(sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK){
+			status = DAO_ERROR_PREPARE;
+			break;
+		}
 
-	if (sqlite3_bind_text(stmt, 1, author->name, -1, SQLITE_STATIC) != SQLITE_OK ||
-		sqlite3_bind_text(stmt, 2, author->surname, -1, SQLITE_STATIC) != SQLITE_OK) {
+		if (sqlite3_bind_text(stmt, 1, name, -1, SQLITE_STATIC) != SQLITE_OK ||
+			sqlite3_bind_text(stmt, 2, surname, -1, SQLITE_STATIC) != SQLITE_OK) {
+			status = DAO_ERROR_BIND;
+			break;
+		}
+
+		if(sqlite3_step(stmt) != SQLITE_DONE){
+			status = DAO_ERROR_EXECUTE;
+			break;
+		}
+		*out_new_id = (int) sqlite3_last_insert_rowid(db);
+		status = DAO_SUCCESS;
+
+	} while (0);
+
+	if (stmt) {
 		sqlite3_finalize(stmt);
-		return FAIL_BIND;
 	}
-
-	if(sqlite3_step(stmt) != SQLITE_DONE){
-		return FAIL_EXECUTE;
-	}
-
-	author->id = (int) sqlite3_last_insert_rowid(db);
-	sqlite3_finalize(stmt);
-	return FAIL_NONE;
+	return status;
 }
-
 // Read
-int author_dao_check_existence(const unsigned char *name, const unsigned char *surname) {
+int author_dao_check_existence(sqlite3 *db, const unsigned char *name, const unsigned char *surname) {
 	sqlite3_stmt *stmt = NULL;
 	const char *sql = "SELECT COUNT(*) FROM Author WHERE name = ? AND surname = ?";
 	if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-		handle_dao_sql_error(FAIL_PREPARE);
+		handle_dao_sql_error(DAO_ERROR_PREPARE);
 		return -1;
 	}
 	if (sqlite3_bind_text(stmt, 1, (const char *) name, -1, SQLITE_STATIC) != SQLITE_OK ||
 		sqlite3_bind_text(stmt, 2, (const char *) surname, -1, SQLITE_STATIC) != SQLITE_OK) {
-		handle_dao_sql_error(FAIL_BIND);
+		handle_dao_sql_error(DAO_ERROR_BIND);
 		return -1;
 	}
 
@@ -92,13 +105,13 @@ int author_dao_check_existence(const unsigned char *name, const unsigned char *s
 	return -1;
 }
 
-int author_dao_count() {
+int author_dao_count(sqlite3 *db) {
 	const char *sql = "SELECT COUNT(*) FROM Author";
 	int count = 0;
 	sqlite3_stmt *stmt;
 
 	if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-		handle_dao_sql_error(FAIL_PREPARE);
+		handle_dao_sql_error(DAO_ERROR_PREPARE);
 		goto null;
 	}
 
@@ -107,12 +120,12 @@ int author_dao_count() {
 	if (rc == SQLITE_ROW) {
 		count = sqlite3_column_int(stmt, 0);
 		if (!count) {
-			handle_dao_sql_error(FAIL_EXECUTE);
+			handle_dao_sql_error(DAO_ERROR_EXECUTE);
 			goto null;
 		}
 	}
 	else {
-		handle_dao_sql_error(FAIL_EXECUTE);
+		handle_dao_sql_error(DAO_ERROR_EXECUTE);
 		goto null;
 	}
 
@@ -125,25 +138,27 @@ int author_dao_count() {
 }
 
 // returns objects in arena, do not free individually
-Author** author_dao_find_all(Arena *a, int *out_count) {
+Author** author_dao_find_all(DAOContext *ctx, Arena *a, int *out_count) {
 	if (!a) return NULL;
 
+	sqlite3 *db = db_get_handle(ctx);
+
 	sqlite3_stmt *stmt = NULL;
-	int author_size = author_dao_count();
+	int author_size = author_dao_count(db);
 	int rc, i = 0;
 
 	if (author_size == 0) {
-		handle_dao_sql_error(FAIL_NOT_FOUND);
+		handle_dao_sql_error(DAO_ERROR_NOT_FOUND);
 		goto fail;
 	}
 
 	Author** authors = (Author**) malloc(sizeof(Author *) * author_size);
 
-	if (!authors) { handle_dao_sql_error(FAIL_MEMORY_ALLOC); goto fail;}
+	if (!authors) { handle_dao_sql_error(DAO_ERROR_UNKNOWN); goto fail;}
 
 	const char *sql = "SELECT id, name, surname FROM Author";
 	if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-		handle_dao_sql_error(FAIL_PREPARE);
+		handle_dao_sql_error(DAO_ERROR_PREPARE);
 		goto fail;
 	}
 
@@ -153,7 +168,7 @@ Author** author_dao_find_all(Arena *a, int *out_count) {
 			sqlite3_column_text(stmt, 1),
 			sqlite3_column_text(stmt,2));
 		if (!author) {
-			handle_dao_sql_error(FAIL_MEMORY_ALLOC);
+			handle_dao_sql_error(DAO_ERROR_UNKNOWN);
 			goto fail;
 		}
 		author->id = sqlite3_column_int(stmt, 0);
@@ -161,7 +176,7 @@ Author** author_dao_find_all(Arena *a, int *out_count) {
 	}
 
 	if (rc != SQLITE_DONE) {
-		handle_dao_sql_error(FAIL_EXECUTE);
+		handle_dao_sql_error(DAO_ERROR_EXECUTE);
 		goto fail;
 	}
 
@@ -174,7 +189,7 @@ Author** author_dao_find_all(Arena *a, int *out_count) {
 
 		for (int j = 0; j < i; j++) {
 			if (authors[j] == NULL) {
-				handle_dao_sql_error(FAIL_NOT_FOUND);
+				handle_dao_sql_error(DAO_ERROR_NOT_FOUND);
 				return NULL;
 			}
 			free_author(authors[j]);
@@ -184,7 +199,7 @@ Author** author_dao_find_all(Arena *a, int *out_count) {
 }
 
 // caller owns the object, must free
-Author* author_dao_find_by_id(Arena *a, int id) {
+Author* author_dao_find_by_id(sqlite3 *db, Arena *a, int id) {
 	if (!a) return NULL;
 
 	sqlite3_stmt *stmt = NULL;
@@ -194,12 +209,12 @@ Author* author_dao_find_by_id(Arena *a, int id) {
 	const char *sql = "SELECT *  FROM Author WHERE id =?";
 
 	if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-		handle_dao_sql_error(FAIL_PREPARE);
+		handle_dao_sql_error(DAO_ERROR_PREPARE);
 		goto fail;
 	}
 
 	if (sqlite3_bind_int(stmt, 1, id) != SQLITE_OK) {\
-		handle_dao_sql_error(FAIL_BIND);
+		handle_dao_sql_error(DAO_ERROR_BIND);
 		goto fail;
 	}
 
@@ -208,13 +223,13 @@ Author* author_dao_find_by_id(Arena *a, int id) {
 		author = author_create_in_arena(a, sqlite3_column_text(stmt, 1), sqlite3_column_text(stmt, 2));
 
 		if (!author) {
-			handle_dao_sql_error(FAIL_MEMORY_ALLOC);
+			handle_dao_sql_error(DAO_ERROR_UNKNOWN);
 			goto fail;
 		}
 		author->id = sqlite3_column_int(stmt, 0);
 	}
 	else {
-		handle_dao_sql_error(FAIL_EXECUTE);
+		handle_dao_sql_error(DAO_ERROR_EXECUTE);
 		goto fail;
 	}
 
@@ -228,25 +243,25 @@ Author* author_dao_find_by_id(Arena *a, int id) {
 		return NULL;
 }
 
-Author* author_dao_update(Author *author, const unsigned char* name, const unsigned char* surname) {
+Author* author_dao_update(sqlite3 *db, Author *author, const unsigned char* name, const unsigned char* surname) {
 	sqlite3_stmt *stmt = NULL;
 	const char *sql = "UPDATE Author"
 				   "SET name = ?, surname = ?"
 					"WHERE id = ?";
 	if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-		handle_dao_sql_error(FAIL_PREPARE);
+		handle_dao_sql_error(DAO_ERROR_PREPARE);
 		goto fail;
 	}
 
 	if (sqlite3_bind_text(stmt, 1, (const char *) name, -1, SQLITE_STATIC) != SQLITE_OK ||
 		sqlite3_bind_text(stmt, 2,(const char *) surname, -1, SQLITE_STATIC) != SQLITE_OK ||
 		sqlite3_bind_int(stmt, 3, author->id) != SQLITE_OK) {
-		handle_dao_sql_error(FAIL_BIND);
+		handle_dao_sql_error(DAO_ERROR_BIND);
 		goto fail;
 	}
 
 	if (sqlite3_step(stmt) != SQLITE_DONE) {
-		handle_dao_sql_error(FAIL_EXECUTE);
+		handle_dao_sql_error(DAO_ERROR_EXECUTE);
 		goto fail;
 	}
 
@@ -297,20 +312,20 @@ Author* author_dao_update(Author *author, const unsigned char* name, const unsig
 // 	return FAIL_NONE;
 // }
 
-failure_status author_dao_delete_all() {
+dao_status author_dao_delete_all(sqlite3 *db) {
 	sqlite3_stmt *stmt = NULL;
 	const char *sql = "DELETE FROM Author";
 
 	if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
 		sqlite3_finalize(stmt);
-		return FAIL_PREPARE;
+		return DAO_ERROR_PREPARE;
 	}
 
 	if (sqlite3_step(stmt) != SQLITE_DONE) {
 		sqlite3_finalize(stmt);
-		return FAIL_EXECUTE;
+		return DAO_ERROR_EXECUTE;
 	}
 
 	sqlite3_finalize(stmt);
-	return FAIL_NONE;
+	return DAO_SUCCESS;
 }

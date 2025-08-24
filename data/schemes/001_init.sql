@@ -1,6 +1,6 @@
 
 create table Author (
-    id integer primary key autoincrement,
+    id bigint primary key autoincrement,
     name text NOT NULL,
     surname text NOT NULL
 );

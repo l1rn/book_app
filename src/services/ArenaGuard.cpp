@@ -1,4 +1,5 @@
-#include "arena_guard.hpp"
+#include "ArenaGuard.hpp"
+#include <iostream>
 
 ArenaGuard::ArenaGuard(size_t capacity) {
     arena_ = arena_create(capacity);
@@ -7,6 +8,7 @@ ArenaGuard::ArenaGuard(size_t capacity) {
 
 ArenaGuard::~ArenaGuard() {
     if (arena_) arena_destroy(arena_);
+    std::cout << "Arena destroyed";
 }
 
 ArenaGuard::ArenaGuard(ArenaGuard&& other) noexcept : arena_(other.arena_) {

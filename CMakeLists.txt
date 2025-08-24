@@ -43,8 +43,8 @@ add_library(app_core STATIC
         src/core/dao/author_dao.c
         src/core/db/db.c
         src/core/db/db.h
-        src/project/execute.hpp
-        src/project/execute.cpp
+        src/project/ExecuteManager.hpp
+        src/project/ExecuteManager.cpp
         src/core/models/author.c
         src/core/models/book.c
         src/core/models/author.h
@@ -53,10 +53,10 @@ add_library(app_core STATIC
         src/core/models/publisher.c
         src/core/memory/arena_api.c
         src/core/memory/arena_api.h
-        src/services/arena_guard.cpp
-        src/services/arena_guard.hpp
-        src/services/author_service.cpp
-        src/services/author_service.hpp
+        src/services/ArenaGuard.cpp
+        src/services/ArenaGuard.hpp
+        src/services/AuthorService.cpp
+        src/services/AuthorService.hpp
 )
 
 target_include_directories(app_core PUBLIC

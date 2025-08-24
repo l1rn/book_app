@@ -4,7 +4,11 @@
 
 sqlite3 *db = NULL;
 
-static char* readFile(const char* path) {
+struct DAOContext {
+    sqlite3 *db;
+};
+
+static char* read_file(const char* path) {
     FILE* file = fopen(path, "rb");
     if (!file) return NULL;
 
@@ -29,28 +33,29 @@ static char* readFile(const char* path) {
     return buffer;
 }
 
-int db_open(const char *filename){
-    if(sqlite3_open(filename, &db) != SQLITE_OK){
+int db_open(const char *filename, DAOContext **ctx_out){
+    *ctx_out = malloc(sizeof(DAOContext));
+    if (!(*ctx_out)) return 1;
+
+    if(sqlite3_open(filename, &(*ctx_out)->db) != SQLITE_OK){
+        free(ctx_out);
         fprintf(stderr, "DB open failed, %s\n", sqlite3_errmsg(db));
         return 1;
     }
-    printf("DB open!\n");
     return 0;
 }
 
-int db_init(const char *schemaPath) {
-    if (db == NULL) {
+int db_init(DAOContext *ctx, const char *schemaPath) {
+    if (ctx == NULL) {
         fprintf(stderr, "Database not open. Call dbOpen first. \n");
         return 1;
     }
 
-    char *schema = readFile(schemaPath);
+    char *schema = read_file(schemaPath);
     if (!schema) {
         fprintf(stderr, "Schema file not found%s\n", schemaPath);
         return 1;
     }
-
-    printf("%s", schema);
     char *errMsg = NULL;
     if (sqlite3_exec(db, schema, 0, 0, &errMsg) != SQLITE_OK) {
         fprintf(stderr, "Schema exec failed: %s\n", errMsg);
@@ -58,10 +63,18 @@ int db_init(const char *schemaPath) {
         free(schema);
         return 1;
     }
+
     free(schema);
     return 0;
 }
 
-void db_close(void) {
-    if (db) sqlite3_close(db);
+void db_close(DAOContext *ctx) {
+    if (ctx) {
+        sqlite3_close(ctx->db);
+        free(ctx);
+    }
+}
+
+sqlite3 *db_get_handle(DAOContext *ctx) {
+    return ctx ? ctx->db : NULL;
 }

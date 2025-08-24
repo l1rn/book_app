@@ -2,23 +2,23 @@
 #include <QApplication>
 
 #include "main_window.hpp"
-#include "services/author_service.hpp"
-#include "src/project/execute.hpp"
+#include "services/AuthorService.hpp"
+#include "src/project/ExecuteManager.hpp"
 
 int main(int argc, char *argv[]) {
 
-    Execute execute;
+    ExecuteManager execute;
     if (execute.open_app() != 0) {
         std::cerr << "Database failed\n";
     }
-    AuthorService author_service;
+    AuthorService authorService(execute.get_context());
+    authorService.printAllAuthors();
 
     QApplication app(argc, argv);
     QMainWindow window;
     window.setGeometry(100, 100, 600, 400);
     window.show();
-    author_service.print_all_authors();
     auto ret = app.exec();
-    Execute::close_app();
+    execute.close_app();
     return ret;
 }
