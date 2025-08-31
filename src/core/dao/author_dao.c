@@ -23,7 +23,7 @@ void handle_dao_sql_error(dao_status status) {
 			msg  = "Record not found.";
 			break;
 		case DAO_ERROR_UNKNOWN:
-			msg = "Unable to allocate memory";
+			msg = "Unknown error";
 			break;
 		case DAO_ALREADY_EXIST:
 			msg = "Record already exist";
@@ -37,7 +37,7 @@ void handle_dao_sql_error(dao_status status) {
 }
 
 // Create
-dao_status author_dao_create(DAOContext *ctx, const char* name, const char* surname, int64_t *out_new_id){
+dao_status author_dao_create(DAOContext *ctx, const char* name, const char* surname, int *out_new_id){
 	if (ctx == NULL || out_new_id == NULL) {
 		return DAO_ERROR_INVALID_ARGS;
 	}
@@ -49,6 +49,7 @@ dao_status author_dao_create(DAOContext *ctx, const char* name, const char* surn
 
 	if (author_dao_check_existence(db, (const unsigned char *) name, (const unsigned char *) surname) == 1) {
 		return DAO_ALREADY_EXIST;
+
 	}
 	sqlite3_stmt *stmt = NULL;
 	const char *sql = "INSERT INTO Author (name, surname) VALUES (?, ?);";
@@ -60,8 +61,8 @@ dao_status author_dao_create(DAOContext *ctx, const char* name, const char* surn
 			break;
 		}
 
-		if (sqlite3_bind_text(stmt, 1, name, -1, SQLITE_STATIC) != SQLITE_OK ||
-			sqlite3_bind_text(stmt, 2, surname, -1, SQLITE_STATIC) != SQLITE_OK) {
+		if (sqlite3_bind_text(stmt, 1, name, -1, SQLITE_TRANSIENT) != SQLITE_OK ||
+			sqlite3_bind_text(stmt, 2, surname, -1, SQLITE_TRANSIENT) != SQLITE_OK) {
 			status = DAO_ERROR_BIND;
 			break;
 		}
@@ -70,6 +71,7 @@ dao_status author_dao_create(DAOContext *ctx, const char* name, const char* surn
 			status = DAO_ERROR_EXECUTE;
 			break;
 		}
+
 		*out_new_id = (int) sqlite3_last_insert_rowid(db);
 		status = DAO_SUCCESS;
 

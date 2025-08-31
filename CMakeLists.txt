@@ -53,10 +53,13 @@ add_library(app_core STATIC
         src/core/models/publisher.c
         src/core/memory/arena_api.c
         src/core/memory/arena_api.h
+        src/core/models/enum.h
         src/services/ArenaGuard.cpp
         src/services/ArenaGuard.hpp
         src/services/AuthorService.cpp
         src/services/AuthorService.hpp
+        src/core/dao/book_dao.h
+        src/core/dao/book_dao.c
 )
 
 target_include_directories(app_core PUBLIC

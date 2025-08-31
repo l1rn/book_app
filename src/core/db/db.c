@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include "db.h"
 
-sqlite3 *db = NULL;
-
 struct DAOContext {
     sqlite3 *db;
 };
@@ -39,15 +37,21 @@ int db_open(const char *filename, DAOContext **ctx_out){
 
     if(sqlite3_open(filename, &(*ctx_out)->db) != SQLITE_OK){
         free(ctx_out);
-        fprintf(stderr, "DB open failed, %s\n", sqlite3_errmsg(db));
+        fprintf(stderr, "DB open failed\n");
         return 1;
     }
+    printf("DP open!");
+    return 0;
+}
+
+int dummy_callback(void *user_data, int argc, char **argv, char **col_name) {
+    DAOContext *ctx = (DAOContext*) user_data;
     return 0;
 }
 
 int db_init(DAOContext *ctx, const char *schemaPath) {
     if (ctx == NULL) {
-        fprintf(stderr, "Database not open. Call dbOpen first. \n");
+        fprintf(stderr, "Database not open. Call db_open first. \n");
         return 1;
     }
 
@@ -56,8 +60,10 @@ int db_init(DAOContext *ctx, const char *schemaPath) {
         fprintf(stderr, "Schema file not found%s\n", schemaPath);
         return 1;
     }
+
     char *errMsg = NULL;
-    if (sqlite3_exec(db, schema, 0, 0, &errMsg) != SQLITE_OK) {
+
+    if (sqlite3_exec(ctx->db, schema, dummy_callback, ctx, &errMsg) != SQLITE_OK) {
         fprintf(stderr, "Schema exec failed: %s\n", errMsg);
         sqlite3_free(errMsg);
         free(schema);

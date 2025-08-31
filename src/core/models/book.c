@@ -6,26 +6,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-Book *create_book(const int isbn13, const int isbn10, const char *bookName, const char *publicationDate, const int pages) {
-    Book b = { 0 };
-    b.isbn13 = isbn13;
-    b.isbn10 = isbn10;
-
-    strncpy(b.book_name, bookName, sizeof b.book_name - 1);
-    strncpy(b.publication_date, publicationDate, sizeof b.publication_date - 1);
-    b.pages = pages;
-
-    b.publisher_id = 0;
-    b.authors = NULL;
-    b.author_count = 0;
-
-    return b;
-}
+// Book *create_book(const int isbn13, const int isbn10, const char *bookName, const char *publicationDate, const int pages) {
+//     Book b = { 0 };
+//     b.isbn13 = isbn13;
+//     b.isbn10 = isbn10;
+//
+//     strncpy(b.book_name, bookName, sizeof b.book_name - 1);
+//     strncpy(b.publication_date, publicationDate, sizeof b.publication_date - 1);
+//     b.pages = pages;
+//
+//     b.publisher_id = 0;
+//     b.authors = NULL;
+//     b.author_count = 0;
+//
+//     return b;
+// }
 
 Book* book_create_in_arena(
     Arena *arena,
-    int isbn13,
-    int isbn10,
+    const char isbn13[14],
+    const char isbn10[11],
     char *book_name,
     const char publication_date[11],
     int pages,
@@ -35,8 +35,8 @@ Book* book_create_in_arena(
 ) {
     Book *b = (Book *) arena_alloc(arena, sizeof(Book));
     if (!b) return NULL;
-    b->isbn13 = isbn13;
-    b->isbn10 = isbn10;
+    memcpy(b->isbn13, isbn13, 14);
+    memcpy(b->isbn10, isbn10, 11);
     b->book_name = book_name;
     memcpy(b->publication_date, publication_date, 11);
     b->pages = pages;
@@ -66,7 +66,7 @@ void book_add_author(Book *b, const Author *author) {
 }
 
 void print_book(Book *book) {
-    printf("ISBN-13: %d", book->isbn13);
+    printf("ISBN-13: %d", *book->isbn13);
 
     printf("\nName: %s\n", book->book_name);
     printf("Pages: %d\n", book->pages);

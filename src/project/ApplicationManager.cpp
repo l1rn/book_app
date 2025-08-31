@@ -6,7 +6,7 @@
 
 extern "C"{
     #include "author.h"
-
+    #include "author_dao.h"
     #include "string.h"
     #include "sys/stat.h"
 }
@@ -17,7 +17,7 @@ ApplicationManager::ApplicationManager(size_t arena_size, Environment env) : env
 
 
 bool ApplicationManager::file_exists(const char* path) {
-    struct stat buffer;
+    struct stat buffer{};
     return stat(path, &buffer) == 0;
 }
 
@@ -29,6 +29,10 @@ void ApplicationManager::init_sample_authors() {
     };
 
     size_t count = std::size(sample_authors);
+    int id;
+    if (author_dao_create(app_db_context, sample_authors[0].name, sample_authors[0].surname, &id) != DAO_SUCCESS) {
+        std::cout << "\n" << "ID: " << id << "\n";
+    }
 }
 
 void ApplicationManager::open_db() {
@@ -54,9 +58,7 @@ void ApplicationManager::open_db() {
             db_close(app_db_context);
             return;
         }
-        if (env_ == Environment::DEV) {
-            init_sample_authors();
-        }
+        init_sample_authors();
     }
     else {
         std::cout << "Database already exists.\n";

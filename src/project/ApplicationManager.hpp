@@ -31,7 +31,7 @@ private:
 
     static bool file_exists(const char* path);
 
-    static void init_sample_authors();
+    void init_sample_authors();
 
     void open_db();
 

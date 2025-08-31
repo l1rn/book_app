@@ -1,12 +1,11 @@
 
 #ifndef AUTHOR_H
 #define AUTHOR_H
-#include <stdint.h>
 
 #include "core/memory/arena_api.h"
 
 typedef struct {
-    int64_t id;
+    int id;
     char* name;
     char* surname;
 } Author;

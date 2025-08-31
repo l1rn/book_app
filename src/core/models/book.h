@@ -6,31 +6,31 @@
 struct Publisher;
 
 typedef struct Book {
-    int     isbn13;
-    int     isbn10;
-    char    *book_name;
-    char    publication_date[11];
-    int     pages;
-    int     publisher_id;
-    Author  *authors;
-    int     author_count;
+    char        isbn13[14];
+    char        isbn10[11];
+    char        *book_name;
+    char        publication_date[11];
+    int         pages;
+    int         publisher_id;
+    Author      *authors;
+    int         author_count;
 } Book;
 
-Book *create_book(
-    int isbn13,
-    int isbn10,
-    const char *book_name,
-    const char *publication_date,
-    int pages,
-    int publisher_id,
-    Author *authors,
-    int author_count
-);
+// Book *create_book(
+//     int isbn13,
+//     int isbn10,
+//     const char *book_name,
+//     const char *publication_date,
+//     int pages,
+//     int publisher_id,
+//     Author *authors,
+//     int author_count
+// );
 
 Book* book_create_in_arena(
     Arena *arena,
-    int isbn13,
-    int isbn10,
+    const char isbn13[14],
+    const char isbn10[11],
     char *book_name,
     const char publication_date[11],
     int pages,

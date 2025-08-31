@@ -13,7 +13,7 @@ AuthorService::AuthorService(DAOContext *ctx, Arena *arena) : ctx_(ctx), arena_(
 }
 
 Author AuthorService::createAuthor(std::string name, std::string surname) {
-    long long author_id = 0;
+    int author_id = 0;
     if (author_dao_create(ctx_, name.c_str(), surname.c_str(), &author_id) != DAO_SUCCESS) {
 
     }
