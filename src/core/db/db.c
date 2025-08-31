@@ -40,7 +40,6 @@ int db_open(const char *filename, DAOContext **ctx_out){
         fprintf(stderr, "DB open failed\n");
         return 1;
     }
-    printf("DP open!");
     return 0;
 }
 

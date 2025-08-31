@@ -39,7 +39,7 @@ void AuthorService::printAllAuthors() {
     std::vector<Author> authors;
     getAllAuthors(authors);
     for (const auto& author : authors) {
-        std::cout << author.surname << "\n";
+        std::cout << author.name << " | " << author.surname << "\n";
     }
 }
 

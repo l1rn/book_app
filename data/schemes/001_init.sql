@@ -6,7 +6,7 @@ create table Author (
 );
 
 create table Publisher (
-   id integer primary key,
+   id integer primary key autoincrement,
    book_count integer DEFAULT 0,
    company_name text NOT NULL
 );

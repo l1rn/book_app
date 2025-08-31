@@ -1,19 +1,17 @@
 #ifndef PUBLISHER_H
 #define PUBLISHER_H
 
+#include "arena_api.h"
+
 struct Book;
 
 typedef struct Publisher{
     int id;
+    int book_count;
+    char* company_name;
     struct Book *books;
-    int bookCount;
-    int bookCapacity;
-    char* companyName;
 } Publisher;
 
+Publisher publisher_create_in_arena(Arena *arena, const char *name);
 Publisher create_publisher(const char* name);
-void print_publisher(const Publisher *publisher);
-void clear_publisher_books(Publisher *p);
-void free_publisher(Publisher *p);
-
 #endif

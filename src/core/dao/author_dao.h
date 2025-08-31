@@ -4,7 +4,6 @@
 
 #include "arena_api.h"
 #include "author.h"
-#include <stdint.h>
 #include "db.h"
 #include "enum.h"
 

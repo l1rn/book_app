@@ -29,9 +29,11 @@ void ApplicationManager::init_sample_authors() {
     };
 
     size_t count = std::size(sample_authors);
-    int id;
-    if (author_dao_create(app_db_context, sample_authors[0].name, sample_authors[0].surname, &id) != DAO_SUCCESS) {
-        std::cout << "\n" << "ID: " << id << "\n";
+    for (size_t i = 0; i < count; i++) {
+        int id;
+        if (author_dao_create(app_db_context, sample_authors[i].name, sample_authors[i].surname, &id) != DAO_SUCCESS) {
+            std::cout << "\n" << "ID: " << id << "\n";
+        }
     }
 }
 

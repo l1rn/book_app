@@ -60,6 +60,8 @@ add_library(app_core STATIC
         src/services/AuthorService.hpp
         src/core/dao/book_dao.h
         src/core/dao/book_dao.c
+        src/core/dao/publisher_dao.h
+        src/core/dao/publisher_dao.c
 )
 
 target_include_directories(app_core PUBLIC
