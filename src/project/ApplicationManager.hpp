@@ -5,6 +5,7 @@
 #include "services/ArenaGuard.hpp"
 extern "C"{
     #include "core/db/db.h"
+    #include "core/dao/publisher_dao.h"
 }
 
 enum Environment {
@@ -32,6 +33,8 @@ private:
     static bool file_exists(const char* path);
 
     void init_sample_authors();
+    void init_sample_publishers();
+    void init_sample_books();
 
     void open_db();
 

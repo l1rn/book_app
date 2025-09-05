@@ -1,4 +1,24 @@
 #include "book_dao.h"
+#include <stdio.h>
+
+int book_dao_count(sqlite3 *db) {
+    sqlite3_stmt *stmt = NULL;
+    const char *sql = "SELECT COUNT(*) FROM Book;";
+    int count = 0;
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        return 0;
+    }
+
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        return 0;
+    }
+    count = sqlite3_column_int(stmt, 0);
+
+    if (stmt) {
+        sqlite3_finalize(stmt);
+    }
+    return count;
+}
 
 dao_status book_dao_create(
     DAOContext *ctx,
@@ -52,4 +72,17 @@ dao_status book_dao_create(
         sqlite3_finalize(stmt);
     }
     return status;
+}
+
+Book *book_dao_find_all(DAOContext *ctx, Arena *a, int *out_count) {
+    if (!ctx || !a) return NULL;
+
+    sqlite3 *db = db_get_handle(ctx);
+    if (!db) return NULL;
+
+    printf("\ncounted books: %d\n", book_dao_count(db));
+
+    sqlite3_stmt *stmt = NULL;
+
+    return NULL;
 }

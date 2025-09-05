@@ -9,6 +9,10 @@ extern "C"{
     #include "author_dao.h"
     #include "string.h"
     #include "sys/stat.h"
+    #include "publisher.h"
+    #include "publisher_dao.h"
+    #include "book.h"
+    #include "book_dao.h"
 }
 
 ApplicationManager::ApplicationManager(size_t arena_size, Environment env) : env_(env) {
@@ -37,6 +41,36 @@ void ApplicationManager::init_sample_authors() {
     }
 }
 
+void ApplicationManager::init_sample_publishers() {
+    Publisher sample_publishers[] = {
+        { .company_name = strdup("Random House Worlds") }
+    };
+    int id;
+    publisher_dao_create(app_db_context, sample_publishers[0].company_name, &id);
+    std::cout << "["<< id << "]" << "Publisher created with name - " << sample_publishers[0].company_name;
+}
+
+void ApplicationManager::init_sample_books() {
+    Book sample_books[] = {
+        {
+            .isbn13 = "9780553593716",
+            .isbn10 = "0553593714",
+            .book_name = strdup("A Game of Thrones"),
+            .publication_date = "22.03.2011",
+            .pages = 864,
+            .publisher_id = 1
+        }
+    };
+    book_dao_create(app_db_context,
+        sample_books[0].isbn13,
+        sample_books[0].isbn10,
+        sample_books[0].book_name,
+        sample_books[0].publication_date,
+        sample_books[0].pages,
+        sample_books[0].publisher_id);
+    std::cout << "The book is created!";
+}
+
 void ApplicationManager::open_db() {
     const char *db_path = nullptr;
     const char *schema_path = nullptr;
@@ -61,6 +95,8 @@ void ApplicationManager::open_db() {
             return;
         }
         init_sample_authors();
+        init_sample_publishers();
+        init_sample_books();
     }
     else {
         std::cout << "Database already exists.\n";
