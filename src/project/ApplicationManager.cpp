@@ -97,6 +97,8 @@ void ApplicationManager::open_db() {
         init_sample_authors();
         init_sample_publishers();
         init_sample_books();
+        int count;
+        book_dao_find_all(app_db_context, arena_.get(), &count);
     }
     else {
         std::cout << "Database already exists.\n";

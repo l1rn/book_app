@@ -14,5 +14,8 @@ dao_status book_dao_create(
     int pages,
     int publisher_id
 );
-Book *book_dao_find_all(DAOContext *ctx, Arena *a, int *out_count);
+
+BookAuthor **book_and_author_find_all(DAOContext *context, Arena *a, int *out_count);
+
+Book **book_dao_find_all(DAOContext *ctx, Arena *a, int *out_count);
 #endif //BOOK_DAO_H

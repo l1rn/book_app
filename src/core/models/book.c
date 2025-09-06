@@ -44,11 +44,22 @@ Book* book_create_in_arena(
     b->authors = authors;
     b->author_count = author_count;
 
-    if (!b->isbn13 && !b->isbn10 && !b->book_name && !b->pages && !b->publisher_id && !b->authors && !b->author_count) {
+    if (!b->isbn13 || !b->isbn10 || !b->book_name || !b->pages || !b->publisher_id) {
         return NULL;
     }
 
     return b;
+}
+
+BookAuthor *book_author_create_in_arena(Arena *a, const char isbn13[14], int author_id) {
+    BookAuthor *ba = (BookAuthor *) arena_alloc(a, sizeof(BookAuthor));
+    if (!ba) return NULL;
+    memcpy(ba->isbn13, isbn13, 14);
+    ba->author_id = author_id;
+    if (!isbn13 || !author_id) {
+        return NULL;
+    }
+    return ba;
 }
 
 void book_set_publisher(Book *b, const Publisher *p) {

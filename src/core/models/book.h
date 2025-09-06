@@ -4,6 +4,10 @@
 #include "author.h"
 
 struct Publisher;
+typedef struct BookAuthor {
+    char        isbn13[14];
+    int         author_id;
+} BookAuthor;
 
 typedef struct Book {
     char        isbn13[14];
@@ -37,6 +41,12 @@ Book* book_create_in_arena(
     int publisher_id,
     Author *authors,
     int author_count
+);
+
+BookAuthor *book_author_create_in_arena(
+    Arena      *a,
+    const char isbn[14],
+    int        author_id
 );
 
 void book_set_publisher(Book *b, const struct Publisher *p);
