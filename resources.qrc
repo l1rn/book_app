@@ -1,5 +1,11 @@
 <RCC>
     <qresource prefix="/icons">
-        <file alias="user">ui/assets/user.png</file>
+        <file alias="user">ui/assets/icons/user.png</file>
+    </qresource>
+    <qresource prefix="/styles">
+        <file alias="global">ui/assets/styles/global.qss</file>
+    </qresource>
+    <qresource prefix="/fonts">
+        <file alias="raleway-regular">ui/assets/fonts/raleway/Raleway-Regular.ttf</file>
     </qresource>
 </RCC>

@@ -1,0 +1,14 @@
+#headerWidget{
+    background: #9c4c4c;
+}
+
+QMainWindow {
+    background: #f0f0f0;
+}
+
+QPushButton{
+    background: #202124;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+}

@@ -5,9 +5,7 @@ set(VERSION_MAJOR 1)
 set(VERSION_MINOR 1)
 set(VERSION_PATCH 0)
 
-if(NOT DEFINED CMAKE_PREFIX_PATH)
-    set(CMAKE_PREFIX_PATH "C:/Qt/6.9.1/mingw_64")
-endif ()
+set(CMAKE_PREFIX_PATH "C:/Qt/6.9.1/mingw_64")
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -22,12 +20,10 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
 
-# -------------- Helper: source collection (keeps lists tide) --------
+# -------- core files --------
 file(GLOB_RECURSE APP_CORE_SOURCES_C
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c"
-
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c"
 )
-
 file(GLOB_RECURSE APP_CORE_SOURCES_CPP
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc"
@@ -91,16 +87,22 @@ target_include_directories(app_ui
             $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(app_ui PRIVATE Qt6::Widgets app_core)
+target_link_libraries(app_ui PRIVATE Qt6::Widgets Qt6::Gui app_core)
 set_target_properties(app_ui PROPERTIES FOLDER "Libraries")
 
 # ----------- Main executable --------------
-add_executable(book_list_app main.cpp)
+add_executable(book_list_app
+        main.cpp
+        resources.qrc
+)
+
 target_link_libraries(book_list_app
         PRIVATE
             app_core
             app_ui
-            Qt6::Widgets)
+            Qt6::Widgets
+            Qt6::Gui
+)
 
 target_include_directories(book_list_app
         PRIVATE

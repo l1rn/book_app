@@ -7,9 +7,10 @@ extern "C"{
     #include "core/models/publisher.h"
     #include "core/models/author.h"
     #include "core/models/book.h"
-    #include "core/dao/author_dao.h"
+
     #include "core/dao/publisher_dao.h"
     #include "core/dao/book_dao.h"
+    #include "core/dao/author_dao.h"
 
     #include "string.h"
     #include "sys/stat.h"
