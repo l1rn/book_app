@@ -2,17 +2,17 @@
 #include <iostream>
 
 #include "ApplicationManager.hpp"
-#include "AuthorService.hpp"
 
 extern "C"{
-    #include "author.h"
-    #include "author_dao.h"
+    #include "core/models/publisher.h"
+    #include "core/models/author.h"
+    #include "core/models/book.h"
+    #include "core/dao/author_dao.h"
+    #include "core/dao/publisher_dao.h"
+    #include "core/dao/book_dao.h"
+
     #include "string.h"
     #include "sys/stat.h"
-    #include "publisher.h"
-    #include "publisher_dao.h"
-    #include "book.h"
-    #include "book_dao.h"
 }
 
 ApplicationManager::ApplicationManager(size_t arena_size, Environment env) : env_(env) {

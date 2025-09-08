@@ -99,6 +99,36 @@ dao_status book_dao_create(
     return status;
 }
 
+int *book_and_author_dao_find_by_isbn(DAOContext *ctx, Arena *a, const char isbn13[14]) {
+    if (!ctx || !a) return NULL;
+    sqlite3 *db = db_get_handle(ctx);
+    if (!db) return NULL;
+
+    sqlite3_stmt *stmt = NULL;
+    const char *sql = "SELECT author_id FROM BookAuthor WHERE isbn13 = ?;";
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        return NULL;
+    }
+
+    if (sqlite3_bind_text(stmt, 0, isbn13, -1, NULL) != SQLITE_OK) {
+        return NULL;
+    }
+
+    int *author_ids;
+    int rc, i = 0;
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+        int new = sqlite3_column_int(stmt, 0);
+        if (!new) return NULL;
+        author_ids[i++] = new;
+    }
+
+    if (rc != SQLITE_DONE) {
+        return NULL;
+    }
+    if (stmt) sqlite3_finalize(stmt);
+    return author_ids;
+}
+
 BookAuthor **book_and_author_dao_find_all(DAOContext *ctx, Arena *a, int *out_count) {
     if (!ctx || !a) return NULL;
 
@@ -164,6 +194,9 @@ Book **book_dao_find_all(DAOContext *ctx, Arena *a, int *out_count) {
     }
 
     Book **books = (Book**) malloc(sizeof(Book *) * book_count);
+    int linked_books;
+    BookAuthor **books_authors = book_and_author_dao_find_all(ctx, a, &linked_books);
+
     if (!books) goto fail;
 
     sqlite3_stmt *stmt = NULL;
@@ -186,6 +219,9 @@ Book **book_dao_find_all(DAOContext *ctx, Arena *a, int *out_count) {
             NULL,
             0
         );
+        if (linked_books > 0) {
+            
+        }
         if (!b) {
             return NULL;
         }

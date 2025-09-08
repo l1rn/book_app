@@ -3,7 +3,7 @@
 #include "AuthorService.hpp"
 
 extern "C"{
-#include "author_dao.h"
+#include "core/dao/author_dao.h"
 }
 
 AuthorService::AuthorService(DAOContext *ctx, Arena *arena) : ctx_(ctx), arena_(arena) {

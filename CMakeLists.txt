@@ -5,7 +5,9 @@ set(VERSION_MAJOR 1)
 set(VERSION_MINOR 1)
 set(VERSION_PATCH 0)
 
-set(CMAKE_PREFIX_PATH "C:/Qt/6.9.1/mingw_64")
+if(NOT DEFINED CMAKE_PREFIX_PATH)
+    set(CMAKE_PREFIX_PATH "C:/Qt/6.9.1/mingw_64")
+endif ()
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -20,83 +22,102 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
 
-if(BUILD_WITH_ASAN)
-    add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
-    add_link_options(-fsanitize=address)
-endif ()
+# -------------- Helper: source collection (keeps lists tide) --------
+file(GLOB_RECURSE APP_CORE_SOURCES_C
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c"
 
-include_directories(
-        src/
-        third_party/hash
-        third_party/sqlite
 )
 
-## Third party lib
+file(GLOB_RECURSE APP_CORE_SOURCES_CPP
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cxx"
+)
+
+file(GLOB_RECURSE APP_CORE_SOURCES_HEADERS
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h"
+)
+
+set(APP_CORE_SOURCES
+    ${APP_CORE_SOURCES_C}
+    ${APP_CORE_SOURCES_CPP}
+    ${APP_CORE_SOURCES_HEADERS}
+)
+
+# ------------- Third-party: sqlite (static) -------------
 add_library(sqlite3 STATIC third_party/sqlite/sqlite3.c)
-target_include_directories(sqlite3 PUBLIC third_party/sqlite)
+
+target_include_directories(sqlite3
+        PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/third_party/sqlite>
+            $<INSTALL_INTERFACE:include/third_party/sqlite>
+)
+
+target_sources(sqlite3
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/sqlite/sqlite3.h
+)
+
 set_target_properties(sqlite3 PROPERTIES FOLDER "ThirdParty")
 
-## Core components lib
-add_library(app_core STATIC
-        third_party/hash/uthash.h
-        src/core/dao/author_dao.h
-        src/core/dao/author_dao.c
-        src/core/db/db.c
-        src/core/db/db.h
-        src/project/ApplicationManager.hpp
-        src/project/ApplicationManager.cpp
-        src/core/models/author.c
-        src/core/models/book.c
-        src/core/models/author.h
-        src/core/models/book.h
-        src/core/models/publisher.h
-        src/core/models/publisher.c
-        src/core/memory/arena_api.c
-        src/core/memory/arena_api.h
-        src/core/models/enum.h
-        src/services/ArenaGuard.cpp
-        src/services/ArenaGuard.hpp
-        src/services/AuthorService.cpp
-        src/services/AuthorService.hpp
-        src/core/dao/book_dao.h
-        src/core/dao/book_dao.c
-        src/core/dao/publisher_dao.h
-        src/core/dao/publisher_dao.c
+
+# ------------ app_core library ----------------
+add_library(app_core STATIC)
+target_sources(app_core
+    PRIVATE
+        ${APP_CORE_SOURCES}
 )
 
-target_include_directories(app_core PUBLIC
-    src/
-    "src/core/memory/"
-    "src/core/models/"
-    "src/core/db/"
-    "src/core/dao/"
-    "src/project"
-    "src/services"
-    "ui/"
-    "third_party"
+target_include_directories(app_core
+        PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+            $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(app_core PRIVATE sqlite3)
+target_link_libraries(app_core PUBLIC sqlite3)
 set_target_properties(app_core PROPERTIES FOLDER "Libraries")
 
-## UI components lib
+## ----------- app_ui library ----------------
 add_library(app_ui STATIC
-    ui/main_window.cpp
-    ui/main_window.hpp
+        ui/MainWindow.cpp
+        ui/MainWindow.hpp
 )
 
-target_include_directories(app_ui PUBLIC ui/)
+target_include_directories(app_ui
+        PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/ui>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+            $<INSTALL_INTERFACE:include>
+)
+
 target_link_libraries(app_ui PRIVATE Qt6::Widgets app_core)
 set_target_properties(app_ui PROPERTIES FOLDER "Libraries")
 
-# Main executable
+# ----------- Main executable --------------
 add_executable(book_list_app main.cpp)
-target_link_libraries(book_list_app PRIVATE app_ui Qt6::Widgets)
+target_link_libraries(book_list_app
+        PRIVATE
+            app_core
+            app_ui
+            Qt6::Widgets)
+
+target_include_directories(book_list_app
+        PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+add_library(SQLite3::SQLite3 ALIAS sqlite3)
+
 set_target_properties(book_list_app PROPERTIES FOLDER "Applications")
 
 install(TARGETS book_list_app
         RUNTIME DESTINATION bin
         BUNDLE DESTINATION .)
+
+install(
+        FILES "${CMAKE_CURRENT_SOURCE_DIR}/third_party/sqlite/sqlite3.h"
+        DESTINATION include/third_party/sqlite
+)
 
 if(WIN32 AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     set(DEBUG_SUFFIX)

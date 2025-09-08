@@ -1,9 +1,9 @@
 #ifndef BOOK_DAO_H
 #define BOOK_DAO_H
 
-#include "book.h"
-#include "db.h"
-#include "enum.h"
+#include "core/models/book.h"
+#include "core/db/db.h"
+#include "core/models/enum.h"
 
 dao_status book_dao_create(
     DAOContext *ctx,

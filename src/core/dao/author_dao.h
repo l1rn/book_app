@@ -2,10 +2,10 @@
 #ifndef AUTHOR_DAO_H
 #define AUTHOR_DAO_H
 
-#include "arena_api.h"
-#include "author.h"
-#include "db.h"
-#include "enum.h"
+#include "core/memory/arena_api.h"
+#include "core/models/author.h"
+#include "core/db/db.h"
+#include "core/models/enum.h"
 
 dao_status      author_dao_create(DAOContext *ctx, const char* name, const char* surname, int *out_new_id);
 
