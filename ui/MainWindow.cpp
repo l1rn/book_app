@@ -2,7 +2,7 @@
 
 #include <QLabel>
 #include <QFile>
-
+#include <QGraphicsBlurEffect>
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     setWindowTitle("Book App");
     resize(800, 600);
@@ -29,6 +29,8 @@ void MainWindow::setupHeader() {
     headerWidget = new QWidget(central);
     headerWidget->setObjectName("headerWidget");
 
+    QGraphicsBlurEffect *blur = new QGraphicsBlurEffect;
+    blur->setBlurRadius(15);
     headerLayout = new QHBoxLayout(headerWidget);
     headerLayout->setContentsMargins(10, 5, 10, 5);
     headerLayout->setSpacing(20);
