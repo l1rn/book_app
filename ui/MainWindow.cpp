@@ -2,10 +2,16 @@
 
 #include <QLabel>
 #include <QFile>
+#include <QFontDatabase>
 #include <QGraphicsBlurEffect>
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     setWindowTitle("Book App");
     resize(800, 600);
+
+    int fontId = QFontDatabase::addApplicationFont(":fonts/raleway-regular");
+    QString family = QFontDatabase::applicationFontFamilies(fontId).at(0);
+    mainFont = family;
+    mainFont.setPointSize(14);
 
     QFile styleFile(":/styles/global");
     setupUI();
@@ -16,26 +22,40 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 }
 
 void MainWindow::setupProfileButton() {
-    profile_button = new QPushButton(this);
-    profile_button->setIcon(QIcon(":icons/user"));
-    profile_button->setText("Profile");
-    profile_button->setIconSize(QSize(24, 24));
-    profile_button->setFixedSize(100, 35);
-    profile_button->setCursor(Qt::PointingHandCursor);
-    connect(profile_button, &QPushButton::released, this, &MainWindow::handleButton);
+    profileButton = new QPushButton(this);
+    profileButton->setIcon(QIcon(":icons/user"));
+    profileButton->setText("Profile");
+    profileButton->setIconSize(QSize(24, 24));
+    profileButton->setFixedSize(100, 35);
+    profileButton->setFont(mainFont);
+    profileButton->setCursor(Qt::PointingHandCursor);
+    connect(profileButton, &QPushButton::released, this, &MainWindow::handleButton);
 }
 
 void MainWindow::setupHeader() {
     headerWidget = new QWidget(central);
     headerWidget->setObjectName("headerWidget");
 
-    QGraphicsBlurEffect *blur = new QGraphicsBlurEffect;
-    blur->setBlurRadius(15);
     headerLayout = new QHBoxLayout(headerWidget);
     headerLayout->setContentsMargins(10, 5, 10, 5);
     headerLayout->setSpacing(20);
     headerLayout->addStretch();
-    headerLayout->addWidget(profile_button);
+
+    // added search input first because we need to put it in the center
+    searchInput = new QLineEdit();
+    searchInput->setFont(mainFont);
+    searchInput->setPlaceholderText("Enter text here...");
+    searchInput->setMaxLength(10);
+
+    searchButton = new QPushButton();
+    searchButton->setFont(mainFont);
+    searchButton->setFixedSize(30, 30);
+    searchButton->setIcon(QIcon(":icons/search"));
+    searchButton->setCursor(Qt::PointingHandCursor);
+
+    headerLayout->addWidget(searchInput);
+    headerLayout->addWidget(searchButton);
+    headerLayout->addWidget(profileButton);
 
     headerWidget->setLayout(headerLayout);
 }

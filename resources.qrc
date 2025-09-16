@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/icons">
         <file alias="user">ui/assets/icons/user.png</file>
+        <file alias="search">ui/assets/icons/search.png</file>
     </qresource>
     <qresource prefix="/styles">
         <file alias="global">ui/assets/styles/global.qss</file>

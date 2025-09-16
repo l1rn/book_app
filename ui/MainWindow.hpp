@@ -1,8 +1,10 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
+
 #include <QMainWindow>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QLineEdit>
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -10,11 +12,16 @@ public:
     explicit MainWindow(QWidget* parent = nullptr);
     ~MainWindow() override = default;
 private:
+    QFont mainFont;
+
     QWidget *central;
     QWidget *headerWidget;
     QWidget *contentWidget;
 
-    QPushButton *profile_button;
+    QLineEdit *searchInput;
+
+    QPushButton *profileButton;
+    QPushButton *searchButton;
 
     QVBoxLayout *mainLayout;
     QVBoxLayout *contentLayout;
