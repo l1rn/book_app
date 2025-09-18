@@ -8,5 +8,6 @@
     </qresource>
     <qresource prefix="/fonts">
         <file alias="raleway-regular">ui/assets/fonts/raleway/Raleway-Regular.ttf</file>
+        <file alias="raleway-bold">ui/assets/fonts/raleway/Raleway-Bold.ttf</file>
     </qresource>
 </RCC>

@@ -13,6 +13,7 @@ public:
     ~MainWindow() override = default;
 private:
     QFont mainFont;
+    QFont boldMainFont;
 
     QWidget *central;
     QWidget *headerWidget;

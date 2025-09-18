@@ -11,7 +11,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     int fontId = QFontDatabase::addApplicationFont(":fonts/raleway-regular");
     QString family = QFontDatabase::applicationFontFamilies(fontId).at(0);
     mainFont = family;
+    boldMainFont = family;
     mainFont.setPointSize(14);
+    boldMainFont.setPointSize(12);
+    boldMainFont.setBold(true);
 
     QFile styleFile(":/styles/global");
     setupUI();
@@ -23,12 +26,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
 void MainWindow::setupProfileButton() {
     profileButton = new QPushButton(this);
+
     profileButton->setIcon(QIcon(":icons/user"));
     profileButton->setText("Profile");
+    profileButton->setFont(mainFont);
     profileButton->setIconSize(QSize(24, 24));
     profileButton->setFixedSize(100, 35);
-    profileButton->setFont(mainFont);
     profileButton->setCursor(Qt::PointingHandCursor);
+
     connect(profileButton, &QPushButton::released, this, &MainWindow::handleButton);
 }
 
