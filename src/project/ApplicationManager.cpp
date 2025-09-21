@@ -3,6 +3,8 @@
 
 #include "ApplicationManager.hpp"
 
+#include "services/BookService.h"
+
 extern "C"{
     #include "core/models/publisher.h"
     #include "core/models/author.h"
@@ -98,12 +100,12 @@ void ApplicationManager::open_db() {
         init_sample_authors();
         init_sample_publishers();
         init_sample_books();
-        int count;
-        book_dao_find_all(app_db_context, arena_.get(), &count);
     }
     else {
         std::cout << "Database already exists.\n";
     }
+    BookService bookService = BookService(app_db_context, arena_.get());
+    bookService.printAllBooks();
 }
 
 Arena *ApplicationManager::get_arena() {

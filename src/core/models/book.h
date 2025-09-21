@@ -35,7 +35,7 @@ Book* book_create_in_arena(
     Arena *arena,
     const char isbn13[14],
     const char isbn10[11],
-    char *book_name,
+    const char unsigned *book_name,
     const char publication_date[11],
     int pages,
     int publisher_id,

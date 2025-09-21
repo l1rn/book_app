@@ -4,6 +4,7 @@
 #include "core/models/book.h"
 #include "core/db/db.h"
 #include "core/models/enum.h"
+#include "core/exceptions/dao_handle.h"
 
 dao_status book_dao_create(
     DAOContext *ctx,

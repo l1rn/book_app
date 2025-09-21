@@ -26,7 +26,7 @@ Book* book_create_in_arena(
     Arena *arena,
     const char isbn13[14],
     const char isbn10[11],
-    char *book_name,
+    const unsigned char *book_name,
     const char publication_date[11],
     int pages,
     int publisher_id,
@@ -35,16 +35,22 @@ Book* book_create_in_arena(
 ) {
     Book *b = (Book *) arena_alloc(arena, sizeof(Book));
     if (!b) return NULL;
-    memcpy(b->isbn13, isbn13, 14);
-    memcpy(b->isbn10, isbn10, 11);
-    b->book_name = book_name;
-    memcpy(b->publication_date, publication_date, 11);
+    strcpy(b->isbn13, isbn13);
+    strcpy(b->isbn10, isbn10);
+    b->book_name = arena_strdup(arena, book_name);
+    strcpy(b->publication_date, publication_date);
     b->pages = pages;
     b->publisher_id = publisher_id;
     b->authors = authors;
     b->author_count = author_count;
 
-    if (!b->isbn13 || !b->isbn10 || !b->book_name || !b->pages || !b->publisher_id) {
+    if (
+        (!b->isbn13 && isbn13) ||
+        (!b->isbn10 && isbn10) ||
+        (!b->book_name && book_name) ||
+        (!b->pages && pages) ||
+        (!b->publisher_id && publisher_id)
+        ) {
         return NULL;
     }
 

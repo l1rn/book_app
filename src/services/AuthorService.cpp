@@ -15,7 +15,7 @@ AuthorService::AuthorService(DAOContext *ctx, Arena *arena) : ctx_(ctx), arena_(
 Author AuthorService::createAuthor(std::string name, std::string surname) {
     int author_id = 0;
     if (author_dao_create(ctx_, name.c_str(), surname.c_str(), &author_id) != DAO_SUCCESS) {
-
+        std::cerr <<  "Fail to create author[" << author_id << "]";
     }
     Author author;
     author.id = author_id;

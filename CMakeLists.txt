@@ -59,7 +59,9 @@ set_target_properties(sqlite3 PROPERTIES FOLDER "ThirdParty")
 
 
 # ------------ app_core library ----------------
-add_library(app_core STATIC)
+add_library(app_core STATIC
+        src/services/BookService.cpp
+        src/services/BookService.h)
 target_sources(app_core
     PRIVATE
         ${APP_CORE_SOURCES}
